@@ -176,11 +176,8 @@ DRV8305_PUBLIC void drv8305_confirm_configuration(void)
 /**
  * @brief Disable DRV8305 gate drivers via GPIO (hardware callback)
  * @details Sets EN_GATE GPIO to low, disabling all gate driver outputs.
- *          Uses processor-specific GPIO function: GPIO_writePin()
  * @return None
  * @note Internal callback - mapped to hw_callbacks.drv8305_disable_io
- * @processor_specific Uses GPIO_writePin() from TI C2000 DSP GPIO library
- * @see GPIO_writePin(), EN_GATE (pin definition in board.h)
  */
 DRV8305_PRIVATE void hardware_drv8305_io_disable_callback(void)
 {
@@ -190,11 +187,8 @@ DRV8305_PRIVATE void hardware_drv8305_io_disable_callback(void)
 /**
  * @brief Enable DRV8305 gate drivers via GPIO (hardware callback)
  * @details Sets EN_GATE GPIO to high, enabling all gate driver outputs.
- *          Uses processor-specific GPIO function: GPIO_writePin()
  * @return None
  * @note Internal callback - mapped to hw_callbacks.drv8305_enable_io
- * @processor_specific Uses GPIO_writePin() from TI C2000 DSP GPIO library
- * @see GPIO_writePin(), EN_GATE (pin definition in board.h)
  */
 DRV8305_PRIVATE void hardware_drv8305_io_enable_callback(void)
 {
@@ -204,11 +198,8 @@ DRV8305_PRIVATE void hardware_drv8305_io_enable_callback(void)
 /**
  * @brief Wake up DRV8305 from sleep mode (hardware callback)
  * @details Sets DRV_WAKE GPIO to high, releasing sleep mode and enabling normal operation.
- *          Uses processor-specific GPIO function: GPIO_writePin()
  * @return None
  * @note Internal callback - mapped to hw_callbacks.drv8305_wake_up_io
- * @processor_specific Uses GPIO_writePin() from TI C2000 DSP GPIO library
- * @see GPIO_writePin(), DRV_WAKE (pin definition in board.h)
  */
 DRV8305_PRIVATE void hardware_drv8305_sleep_io_enable_callback(void)
 {
@@ -218,11 +209,8 @@ DRV8305_PRIVATE void hardware_drv8305_sleep_io_enable_callback(void)
 /**
  * @brief Put DRV8305 into sleep mode (hardware callback)
  * @details Sets DRV_WAKE GPIO to low, placing IC into low-power sleep state.
- *          Uses processor-specific GPIO function: GPIO_writePin()
  * @return None
  * @note Internal callback - mapped to hw_callbacks.drv8305_sleep_io
- * @processor_specific Uses GPIO_writePin() from TI C2000 DSP GPIO library
- * @see GPIO_writePin(), DRV_WAKE (pin definition in board.h)
  */
 DRV8305_PRIVATE void hardware_drv8305_sleep_io_disable_callback(void)
 {    
@@ -231,14 +219,10 @@ DRV8305_PRIVATE void hardware_drv8305_sleep_io_disable_callback(void)
 
 /**
  * @brief Transmit SPI command packet (hardware callback)
- * @details Sends 16-bit command packet to DRV8305 via SPI in blocking mode.
- *          Uses processor-specific SPI function: SPI_writeDataBlockingFIFO()
+ * @details Sends 16-bit command packet to DRV8305 via SPIA in blocking mode.
  * @param[in] data SPI packet data to transmit
  * @return None
  * @note Internal callback - mapped to hw_callbacks.drv8305_spi_transmit_cb
- * @processor_specific Uses SPI_writeDataBlockingFIFO() from TI C2000 DSP SPI library
- *                     SPI bus: SPIA (16-bit blocking FIFO mode)
- * @see SPI_writeDataBlockingFIFO(), SPIA_BASE (SPI configuration in device.h)
  */
 DRV8305_PRIVATE void hardware_spi_transmit_callback(uint16_t data)
 {
@@ -247,13 +231,9 @@ DRV8305_PRIVATE void hardware_spi_transmit_callback(uint16_t data)
 
 /**
  * @brief Receive SPI response packet (hardware callback)
- * @details Reads 16-bit response packet from DRV8305 via SPI in blocking mode.
- *          Uses processor-specific SPI function: SPI_readDataBlockingFIFO()
+ * @details Reads 16-bit response packet from DRV8305 via SPIA in blocking mode.
  * @return uint16_t SPI response packet data
  * @note Internal callback - mapped to hw_callbacks.drv8305_spi_receive_cb
- * @processor_specific Uses SPI_readDataBlockingFIFO() from TI C2000 DSP SPI library
- *                     SPI bus: SPIA (16-bit blocking FIFO mode)
- * @see SPI_readDataBlockingFIFO(), SPIA_BASE (SPI configuration in device.h)
  */
 DRV8305_PRIVATE uint16_t hardware_spi_receive_callback(void)
 {
