@@ -296,23 +296,115 @@ DRV8305_PUBLIC void drv8305_motor_stop(void);
 DRV8305_PUBLIC void drv8305_confirm_configuration(void);
 ```
 
+### Public Configuration Functions
+
+#### `drv8305_get_configuration()`
+```c
+/**
+ * @brief Get current DRV8305 configuration
+ * @details Retrieves pointer to the active default_configuration structure
+ *          containing all current control register settings.
+ * @return drv8305_configuration_t* Non-NULL pointer to configuration structure
+ * @note Pointer remains valid throughout driver lifetime
+ * @usage Modify settings and apply with drv8305_set_configuration()
+ * 
+ * @example
+ * drv8305_configuration_t* config = drv8305_get_configuration();
+ * config->hs_gate_drive.peak_current = DRV8305_CTRL05_IPEAK_2_75A;
+ * drv8305_set_configuration(config);
+ */
+DRV8305_PUBLIC drv8305_configuration_t* drv8305_get_configuration(void);
+```
+
+#### `drv8305_set_configuration()`
+```c
+/**
+ * @brief Set new DRV8305 configuration
+ * @details Copies provided configuration structure into internal default configuration.
+ *          Changes take effect after drv8305_api_confirm_configuration() call.
+ * @param[in] cfg Pointer to new configuration structure to apply
+ * @return None
+ * @note Entire configuration is copied (memcpy operation)
+ * @warning Configuration changes require drv8305_api_confirm_configuration() to take effect
+ * 
+ * @example
+ * drv8305_configuration_t* config = drv8305_get_configuration();
+ * config->gate_drive.pwm_mode = DRV8305_PWM_MODE_PWM_SYNC;
+ * drv8305_set_configuration(config);
+ * drv8305_api_confirm_configuration();  // Apply changes to IC
+ */
+DRV8305_PUBLIC void drv8305_set_configuration(drv8305_configuration_t *cfg);
+```
+
 ---
 
 ## 🔧 Configuration
 
-### Default Configuration Access
+### Configuration Module Location
+
+**File:** `DRV8305_Config/drv8305_configuration.h`  
+**Functions:** `drv8305_get_configuration()`, `drv8305_set_configuration()`  
+**Header Declarations:** Full Doxygen documentation with usage examples
+
+### Accessing Configuration
+
+The DRV8305 driver provides two main functions for configuration management:
+
+#### `drv8305_get_configuration()`
+Returns pointer to current configuration structure. Allows reading and modifying any register parameter.
 
 ```c
-// Get current configuration pointer
+// Get current configuration
 drv8305_configuration_t* config = drv8305_get_configuration();
 
-// Modify configuration
+// Access individual register settings
+uint16_t current_peak = config->hs_gate_drive.peak_current;
+uint16_t watchdog_time = config->ic_operation.watchdog_time;
+```
+
+#### `drv8305_set_configuration()`
+Applies new configuration to the driver. Must call `drv8305_api_confirm_configuration()` to send changes to IC.
+
+```c
+// Create new configuration
+drv8305_configuration_t* config = drv8305_get_configuration();
+
+// Modify settings
 config->hs_gate_drive.peak_current = DRV8305_CTRL05_IPEAK_2_75A;
 config->gate_drive.pwm_mode = DRV8305_PWM_MODE_PWM_SYNC;
 config->ic_operation.watchdog_time = DRV8305_CTRL09_WD_TIME_2ms;
 
-// Apply new configuration (during next control cycle)
+// Apply configuration (sends to IC during next control cycle)
 drv8305_set_configuration(config);
+drv8305_api_confirm_configuration();  // Must call to apply changes
+```
+
+### Complete Configuration Example
+
+```c
+// 1. Get current config
+drv8305_configuration_t* config = drv8305_get_configuration();
+
+// 2. Modify Gate Drive parameters
+config->hs_gate_drive = {
+    .peak_current = DRV8305_CTRL05_IPEAK_2_75A,  // 2.75A peak
+    .drive_time = DRV8305_CTRL05_TDRV_500ns      // 500ns drive time
+};
+
+config->ls_gate_drive = {
+    .peak_current = DRV8305_CTRL06_IPEAK_2_75A,
+    .drive_time = DRV8305_CTRL06_TDRV_500ns
+};
+
+// 3. Modify IC Operation
+config->ic_operation = {
+    .watchdog_time = DRV8305_CTRL09_WD_TIME_2ms,
+    .undervoltage_level = DRV8305_CTRL09_UV_LEVEL_8_0V
+};
+
+// 4. Apply configuration
+drv8305_set_configuration(config);
+drv8305_api_confirm_configuration();
 ```
 
 ### Key Configuration Parameters
@@ -398,12 +490,46 @@ DRV8305_PRIVATE void drv8305_vgs_faults_callback(void *self, uint16_t data)
 - SPI packet handling: `drv8305_spi_write_packet_create()`, `drv8305_spi_read_packet_create()`
 - State transitions: `drv8305_main_sm_go_to_next_state()`
 
-### Configuration Module (`DRV8305_Config/`)
+### Configuration Module (`DRV8305_Config/`) ⭐ IMPORTANT
 
 **drv8305_configuration.h / drv8305_configuration.c**
-- `drv8305_get_configuration()` - Access current config
-- `drv8305_set_configuration()` - Update config values
-- Default register values per DRV8305-Q1 datasheet
+
+This module manages all DRV8305 register configuration and provides two critical public functions:
+
+- **`drv8305_get_configuration()`** - Get pointer to current configuration structure
+  - Returns: `drv8305_configuration_t*` (non-NULL, valid for lifetime of driver)
+  - Usage: Read and modify individual register parameters
+  - Always available: Call anytime to access/modify settings
+
+- **`drv8305_set_configuration(cfg)`** - Apply new configuration to driver
+  - Copies entire configuration structure via memcpy
+  - Changes take effect after `drv8305_api_confirm_configuration()` call
+  - Usage: Update multiple parameters and apply atomically
+
+**Configuration Structure:**
+```
+drv8305_configuration_t
+├── hs_gate_drive (Register 0x05 parameters)
+├── ls_gate_drive (Register 0x06 parameters)
+├── gate_drive (Register 0x07 parameters)
+├── ic_operation (Register 0x09 parameters)
+├── shunt_amplifier (Register 0x0A parameters)
+├── voltage_regulator (Register 0x0B parameters)
+└── vds_sense (Register 0x0C parameters)
+```
+
+**Typical Configuration Flow:**
+```
+1. drv8305_get_configuration()     ← Access current settings
+2. Modify config structure members  ← Change parameters
+3. drv8305_set_configuration()     ← Apply changes
+4. drv8305_api_confirm_configuration() ← Send to IC
+```
+
+**⭐ Quick Find:**
+- Header: `DRV8305_Config/drv8305_configuration.h` (lines 52-97)
+- Implementation: `DRV8305_Config/drv8305_configuration.c` (lines 144-163)
+- Full Doxygen docs with @example tags in header file
 
 ### Status Register Handlers (`DRV8305_Status_Registers/`)
 
