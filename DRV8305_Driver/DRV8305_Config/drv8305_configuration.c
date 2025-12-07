@@ -1,8 +1,9 @@
 /**
  * @file drv8305_configuration.c
- * @brief DRV8305 Configuration Module - Implementation
- * @details Implements configuration getter/setter functions and maintains
- *          the default configuration instance from DRV8305-Q1 datasheet.
+ * @brief DRV8305 Configuration Module - Data Definitions
+ * @details Contains default configuration instance with DRV8305-Q1 datasheet values.
+ *          Function implementations (drv8305_get_configuration, drv8305_set_configuration)
+ *          have been moved to drv8305_api.c for unified API implementation.
  * @author Furkan YAYLA
  * @email yaylafurkan@protonmail.com
  * @date December 2025
@@ -11,9 +12,7 @@
  * @purpose
  * This implementation file:
  *   - Defines default_configuration instance with DRV8305-Q1 datasheet reset values
- *   - Implements drv8305_get_configuration() - returns pointer to current config
- *   - Implements drv8305_set_configuration() - copies new config values
- *   - Uses memset/memcpy for safe configuration memory operations
+ *   - Note: getter/setter function implementations are in drv8305_api.c
  * 
  * @datasheet_reference
  * DRV8305-Q1 Functional Block Diagram (Page 36)
