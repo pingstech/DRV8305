@@ -49,8 +49,61 @@ typedef struct
     drv8305_ctrl0C_vds_t     vds_sense;
 } drv8305_configuration_t;
 
+// ============================================================================
+// PUBLIC CONFIGURATION INTERFACE - Get/Set Functions
+// ============================================================================
+
+/**
+ * @brief Get current DRV8305 configuration
+ * @details Retrieves pointer to the active default_configuration structure
+ *          containing all current control register settings (gate drive,
+ *          IC operation, shunt amplifier, voltage regulator, VDS sensing).
+ * @return drv8305_configuration_t* Non-NULL pointer to default configuration structure
+ * @note Pointer remains valid throughout driver lifetime
+ * @usage Modify configuration settings and apply with drv8305_set_configuration()
+ * @see drv8305_set_configuration(), drv8305_configuration_t
+ * 
+ * @example
+ * @code
+ * // Get current configuration
+ * drv8305_configuration_t* config = drv8305_get_configuration();
+ * 
+ * // Modify gate drive settings
+ * config->hs_gate_drive.peak_current = DRV8305_CTRL05_IPEAK_2_75A;
+ * config->gate_drive.pwm_mode = DRV8305_PWM_MODE_PWM_SYNC;
+ * 
+ * // Apply new configuration to IC
+ * drv8305_set_configuration(config);
+ * @endcode
+ */
 DRV8305_PUBLIC drv8305_configuration_t* drv8305_get_configuration(void);
-DRV8305_PUBLIC void                     drv8305_set_configuration(drv8305_configuration_t *cfg);
+
+/**
+ * @brief Set new DRV8305 configuration
+ * @details Copies provided configuration structure into the internal
+ *          default_configuration, replacing all control register settings.
+ *          Changes take effect after drv8305_api_confirm_configuration() call.
+ * @param[in] cfg Pointer to new configuration structure to apply
+ * @return None
+ * @note Entire configuration is copied (memcpy operation)
+ * @warning Configuration changes require drv8305_api_confirm_configuration() to take effect
+ * @see drv8305_get_configuration(), drv8305_api_confirm_configuration()
+ * 
+ * @example
+ * @code
+ * // Create new configuration
+ * drv8305_configuration_t new_config = {
+ *     .hs_gate_drive = { .peak_current = DRV8305_CTRL05_IPEAK_1_70A },
+ *     .ls_gate_drive = { .peak_current = DRV8305_CTRL06_IPEAK_1_70A },
+ *     // ... other settings
+ * };
+ * 
+ * // Apply new configuration
+ * drv8305_set_configuration(&new_config);
+ * drv8305_api_confirm_configuration();  // Must call to apply changes to IC
+ * @endcode
+ */
+DRV8305_PUBLIC void drv8305_set_configuration(drv8305_configuration_t *cfg);
 
 #ifdef __cplusplus
 }
