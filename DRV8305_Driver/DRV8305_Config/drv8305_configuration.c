@@ -132,30 +132,3 @@ DRV8305_PRIVATE drv8305_configuration_t default_configuration =
         .vds_mode  = DRV8305_VDS_MODE_LATCH_SHUTDOWN  // Bits 2:0 - Default: Latched Shutdown
     }
 };
-
-/**
- * @brief Get current DRV8305 configuration (pointer to default config)
- * @details Returns pointer to default_configuration structure containing all
- *          control register settings (gate drive, IC operation, sensing, etc.)
- * @return drv8305_configuration_t* Pointer to default configuration structure
- * @see drv8305_set_configuration, drv8305_configuration_t
- */
-DRV8305_PUBLIC drv8305_configuration_t* drv8305_get_configuration(void)
-{
-    return &default_configuration;
-}
-
-/**
- * @brief Set new DRV8305 configuration
- * @details Copies provided configuration structure into default_configuration,
- *          replacing all current settings with new values.
- * @param[in] cfg Pointer to new configuration structure to copy
- * @return None
- * @note Configuration takes effect after drv8305_api_confirm_configuration() is called
- * @see drv8305_get_configuration, drv8305_configuration_t
- */
-DRV8305_PUBLIC void drv8305_set_configuration(drv8305_configuration_t *cfg)
-{
-    memset(&default_configuration, 0, sizeof(drv8305_configuration_t));
-    memcpy(&default_configuration, cfg, sizeof(drv8305_configuration_t));
-}
