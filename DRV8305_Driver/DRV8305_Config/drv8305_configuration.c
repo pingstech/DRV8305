@@ -31,8 +31,8 @@
 
 #include <string.h>
 
-#include "drv8305_configuration.h"
 #include "drv8305_macros.h"
+#include "drv8305_configuration.h"
 
 /* ---------------------------------------------------------------------------
  * DRV8305 Default Configuration Object

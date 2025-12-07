@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 #include "drv8305_macros.h"
-#include "drv8305_control_registers_definitions.h"
+#include "DRV8305_Control_Registers/drv8305_control_registers_definitions.h"
 
 /**
  * @brief Complete DRV8305 configuration structure

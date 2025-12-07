@@ -17,6 +17,7 @@
  * 
  * @timing_constants
  * DRV8305_REGISTER_SWITCH_DELAY_MS: Delay between consecutive SPI register operations (50ms)
+ * DRV8305_STANDARD_TASK_DELAY_TIMEOUT: Standard task delay timeout for state machine transitions (50ms)
  * DRV8305_STATUS_POLLING_INTERVAL_MS: Interval for periodic status register polling (250ms)
  * DRV8305_NUMBER_OF_REGISTERS: Total registers managed (11: 4 status + 7 control)
  * 
@@ -40,6 +41,8 @@ extern "C" {
 #define DRV8305_NUMBER_OF_REGISTERS         (int)11
 /** @brief Interval for periodic status register polling in milliseconds */
 #define DRV8305_STATUS_POLLING_INTERVAL_MS  (int)250
+/** @brief Standard task delay timeout for state machine transitions in milliseconds */
+#define DRV8305_STANDARD_TASK_DELAY_TIMEOUT (int)50
 /** @brief Delay between consecutive SPI register operations in milliseconds */
 #define DRV8305_REGISTER_SWITCH_DELAY_MS    (int)50
 

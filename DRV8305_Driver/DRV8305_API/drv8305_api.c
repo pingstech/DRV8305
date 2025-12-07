@@ -34,10 +34,13 @@
 #include <string.h>
 
 #include "drv8305_macros.h"
-#include "drv8305_configuration.h"
-#include "drv8305_control_registers_params.h"
 #include "drv8305_register_map.h"
+#include "DRV8305_Config/drv8305_configuration.h"
+#include "DRV8305_Control_Registers/drv8305_control_registers_definitions.h"
 #include "drv8305_api.h"
+
+#include "DRV8305_Status_Registers/drv8305_status_registers_handlers.h"
+#include "DRV8305_Control_Registers/drv8305_control_registers_handlers.h"
 
 /* -------------------------------- FUNCTION PROTOTYPES -------------------------------- */
 DRV8305_PRIVATE void     drv8305_status_register_process_polling  (drv8305_user_object_t *self);

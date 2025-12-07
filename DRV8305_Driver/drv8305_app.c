@@ -34,9 +34,9 @@
 #include "c2000ware_libraries.h"
 
 #include "drv8305_macros.h"
-#include "drv8305_status_registers_handlers.h"
-#include "drv8305_control_registers_handlers.h"
-#include "drv8305_api.h"
+#include "DRV8305_Status_Registers/drv8305_status_registers_handlers.h"
+#include "DRV8305_Control_Registers/drv8305_control_registers_handlers.h"
+#include "DRV8305_API/drv8305_api.h"
 #include "drv8305_app.h"
 
 DRV8305_PRIVATE void     hardware_drv8305_io_disable_callback       (void);
@@ -57,7 +57,7 @@ DRV8305_PRIVATE void     drv8305_gate_drive_callback                (void *self,
 DRV8305_PRIVATE void     drv8305_ic_operation_callback              (void *self, uint16_t data);
 DRV8305_PRIVATE void     drv8305_shunt_amplifier_callback           (void *self, uint16_t data);
 DRV8305_PRIVATE void     drv8305_voltage_regulator_callback         (void *self, uint16_t data);
-DRV8305_PRIVATE void     drv8305_vds_sens_callback                  (void *self, uint16_t data);
+DRV8305_PRIVATE void     drv8305_vds_sense_callback                 (void *self, uint16_t data);
 
 DRV8305_PRIVATE drv8305_user_object_t user_drv8305_obj =
 {
@@ -87,14 +87,10 @@ DRV8305_PRIVATE drv8305_user_object_t user_drv8305_obj =
         .drv8305_ic_operation_register_cb              = drv8305_ic_operation_callback,
         .drv8305_shunt_amplifier_control_register_cb   = drv8305_shunt_amplifier_callback,
         .drv8305_voltage_regulator_control_register_cb = drv8305_voltage_regulator_callback,
-        .drv8305_vds_sense_control_register_cb         = drv8305_vds_sens_callback
+        .drv8305_vds_sense_control_register_cb         = drv8305_vds_sense_callback
     }
 };
 
-DRV8305_PUBLIC void drv8305_initialize(void)
-{
-    drv8305_initialize(&user_drv8305_obj);
-}
 
 /**
  * @brief Initialize DRV8305 driver with application configuration
@@ -105,6 +101,11 @@ DRV8305_PUBLIC void drv8305_initialize(void)
  * @see drv8305_polling, drv8305_timer
  */
 DRV8305_PUBLIC void drv8305_initialize(void)
+{
+    drv8305_api_initialize(&user_drv8305_obj);
+}
+
+/*
  * @brief Main polling function for DRV8305 driver
  * @details Application-level polling wrapper executing one state machine cycle.
  *          Call from main application loop at regular intervals.
@@ -396,7 +397,7 @@ DRV8305_PRIVATE void drv8305_voltage_regulator_callback(void *self, uint16_t dat
  * @param[in] data VDS Sense Control register contents (echo)
  * @return None
  */
-DRV8305_PRIVATE void drv8305_vds_sens_callback(void *self, uint16_t data)
+DRV8305_PRIVATE void drv8305_vds_sense_callback(void *self, uint16_t data)
 {
     drv8305_vds_sense_register_handler(data);
 }
