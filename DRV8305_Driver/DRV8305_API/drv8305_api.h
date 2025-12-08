@@ -29,6 +29,7 @@ extern "C" {
 
 #include <stdint.h>
 
+#include "drv8305_macros.h"
 #include "drv8305_register_map.h"
 #include "DRV8305_Config/drv8305_configuration.h"
 
@@ -261,7 +262,7 @@ DRV8305_PUBLIC void drv8305_set_configuration(drv8305_configuration_t *cfg);
  * @note Call after drv8305_api_initialize() when configuration is ready
  * @see drv8305_api_initialize
  */
-DRV8305_PUBLIC void drv8305_api_confirm_configuration(drv8305_user_object_t *self)
+DRV8305_PUBLIC void drv8305_api_confirm_configuration(drv8305_user_object_t *self);
 
 #ifdef __cplusplus
 }

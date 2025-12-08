@@ -70,18 +70,20 @@ DRV8305_PRIVATE uint16_t drv8305_control_register_0C_parser       (drv8305_user_
  */
 DRV8305_PRIVATE const drv8305_register_types_t drv8305_registers[DRV8305_NUMBER_OF_REGISTERS] = 
 {
-    DRV8305_STATUS_01,
-    DRV8305_STATUS_02,
-    DRV8305_STATUS_03,
-    DRV8305_STATUS_04,
-    DRV8305_CONTROL_05,
-    DRV8305_CONTROL_06,
-    DRV8305_CONTROL_07,
-    DRV8305_CONTROL_09,
-    DRV8305_CONTROL_0A,
-    DRV8305_CONTROL_0B,
-    DRV8305_CONTROL_0C
+     DRV8305_STATUS_01,
+     DRV8305_STATUS_02,
+     DRV8305_STATUS_03,
+     DRV8305_STATUS_04,
+     DRV8305_CONTROL_05,
+     DRV8305_CONTROL_06,
+     DRV8305_CONTROL_07,
+     DRV8305_CONTROL_09,
+     DRV8305_CONTROL_0A,
+     DRV8305_CONTROL_0B,
+     DRV8305_CONTROL_0C
 };
+
+extern drv8305_configuration_t default_configuration;
 
 /* -------------------------------- PUBLIC FUNCTIONS -------------------------------- */
 
@@ -500,7 +502,7 @@ DRV8305_PRIVATE void drv8305_main_sm_go_to_next_state(drv8305_user_object_t *sel
 DRV8305_PRIVATE void drv8305_status_sm_go_to_next_state(drv8305_user_object_t *self, drv8305_status_sm_state_e next_state, uint32_t delay_time)
 {
     self->state.cycle_time        = 0;
-    self->state.status_state      = DRV8305_STATUS_DELAY_STATE;
+    self->state.status_state      = DRV8305_SM_STATUS_CYCLE_DELAY;
     self->state.next_status_state = next_state;
     self->state.delay_time        = delay_time;
 }

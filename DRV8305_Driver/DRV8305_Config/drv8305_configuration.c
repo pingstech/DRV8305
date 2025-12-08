@@ -38,7 +38,7 @@
  * DRV8305 Default Configuration Object
  * Reference: DRV8305-Q1 Datasheet (Pages 40-44, "Reset Value" columns)
  * --------------------------------------------------------------------------- */
-DRV8305_PRIVATE drv8305_configuration_t default_configuration = 
+DRV8305_PUBLIC drv8305_configuration_t default_configuration =
 {
     /* -----------------------------------------------------------------------
      * Register 0x05: HS Gate Drive Control

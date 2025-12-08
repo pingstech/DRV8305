@@ -275,7 +275,7 @@ DRV8305_PRIVATE uint16_t hardware_spi_receive_callback(void)
  */
 DRV8305_PRIVATE void drv8305_warning_callback(void *self, uint16_t data)
 {
-    drv8305_warning_register_handler(data);
+    drv8305_warning_register_handler(self, data);
 }
 
 /**
@@ -287,7 +287,7 @@ DRV8305_PRIVATE void drv8305_warning_callback(void *self, uint16_t data)
  */
 DRV8305_PRIVATE void drv8305_ov_vds_callback(void *self, uint16_t data)
 {
-    drv8305_ov_vds_register_handler(data);
+    drv8305_ov_vds_register_handler(self, data);
 }
 
 /**
@@ -299,7 +299,7 @@ DRV8305_PRIVATE void drv8305_ov_vds_callback(void *self, uint16_t data)
  */
 DRV8305_PRIVATE void drv8305_ic_faults_callback(void *self, uint16_t data)
 {
-    drv8305_ic_faults_register_handler(data);
+    drv8305_ic_faults_register_handler(self, data);
 }
 
 /**
@@ -311,7 +311,7 @@ DRV8305_PRIVATE void drv8305_ic_faults_callback(void *self, uint16_t data)
  */
 DRV8305_PRIVATE void drv8305_vgs_faults_callback(void *self, uint16_t data)
 {
-    drv8305_vgs_faults_register_handler(data);
+    drv8305_vgs_faults_register_handler(self, data);
 }
 
 // ============================================================================
@@ -327,7 +327,7 @@ DRV8305_PRIVATE void drv8305_vgs_faults_callback(void *self, uint16_t data)
  */
 DRV8305_PRIVATE void drv8305_hs_gate_drive_callback(void *self, uint16_t data)
 {
-    drv8305_hs_gate_driver_register_handler(data);
+    drv8305_hs_gate_drive_register_handler(self, data);
 }
 
 /**
@@ -339,7 +339,7 @@ DRV8305_PRIVATE void drv8305_hs_gate_drive_callback(void *self, uint16_t data)
  */
 DRV8305_PRIVATE void drv8305_ls_gate_drive_callback(void *self, uint16_t data)
 {
-    drv8305_ls_gate_drive_register_handler(data);
+    drv8305_ls_gate_drive_register_handler(self, data);
 }
 
 /**
@@ -351,7 +351,7 @@ DRV8305_PRIVATE void drv8305_ls_gate_drive_callback(void *self, uint16_t data)
  */
 DRV8305_PRIVATE void drv8305_gate_drive_callback(void *self, uint16_t data)
 {
-    drv8305_gate_drive_register_handler(data);
+    drv8305_gate_drive_register_handler(self, data);
 }
 
 /**
@@ -363,7 +363,7 @@ DRV8305_PRIVATE void drv8305_gate_drive_callback(void *self, uint16_t data)
  */
 DRV8305_PRIVATE void drv8305_ic_operation_callback(void *self, uint16_t data)
 {
-    drv8305_ic_operation_register_handler(data);
+    drv8305_ic_operation_register_handler(self, data);
 }
 
 /**
@@ -375,7 +375,7 @@ DRV8305_PRIVATE void drv8305_ic_operation_callback(void *self, uint16_t data)
  */
 DRV8305_PRIVATE void drv8305_shunt_amplifier_callback(void *self, uint16_t data)
 {
-    drv8305_shunt_amplifier_register_handler(data);
+    drv8305_shunt_amplifier_register_handler(self, data);
 }
 
 /**
@@ -387,7 +387,7 @@ DRV8305_PRIVATE void drv8305_shunt_amplifier_callback(void *self, uint16_t data)
  */
 DRV8305_PRIVATE void drv8305_voltage_regulator_callback(void *self, uint16_t data)
 {
-    drv8305_voltage_regulator_register_handler(data);
+    drv8305_voltage_regulator_register_handler(self, data);
 }
 
 /**
@@ -399,5 +399,5 @@ DRV8305_PRIVATE void drv8305_voltage_regulator_callback(void *self, uint16_t dat
  */
 DRV8305_PRIVATE void drv8305_vds_sense_callback(void *self, uint16_t data)
 {
-    drv8305_vds_sense_register_handler(data);
+    drv8305_vds_sense_register_handler(self, data);
 }

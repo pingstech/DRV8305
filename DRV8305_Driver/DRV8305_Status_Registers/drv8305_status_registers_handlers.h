@@ -31,6 +31,9 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+#include "drv8305_macros.h"
+
 DRV8305_PUBLIC void drv8305_warning_register_handler    (void *self, uint16_t data);
 DRV8305_PUBLIC void drv8305_ov_vds_register_handler     (void *self, uint16_t data);
 DRV8305_PUBLIC void drv8305_ic_faults_register_handler  (void *self, uint16_t data);
