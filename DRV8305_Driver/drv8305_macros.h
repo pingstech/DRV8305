@@ -34,8 +34,8 @@
 extern "C" {
 #endif
 
-#define DRV8305_PRIVATE static
 #define DRV8305_PUBLIC
+#define DRV8305_PRIVATE static
 
 /** @brief Total number of managed registers (4 status + 7 control) */
 #define DRV8305_NUMBER_OF_REGISTERS         (int)11

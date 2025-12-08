@@ -37,7 +37,10 @@
  * @brief Handle DRV8305 Control Register 0x05 (HS Gate Drive Control)
  * @details Processes high-side gate drive configuration acknowledgment including
  *          peak current drive time, sink current, and source current settings.
- * @param[in] self Pointer to DRV8305 user object context\n * @param[in] data Control register 0x05 data bits (echo of written value)\n * @return None\n * @note Callback triggered after register write confirmation\n * @see DRV8305_PACK_CTRL05, drv8305_ctrl05_hs_gate_t\n */\nDRV8305_PUBLIC void drv8305_hs_gate_drive_register_handler(void *self, uint16_t data)
+ * @param[in] self Pointer to DRV8305 user object context\n * @param[in] data Control register 0x05 data bits (echo of written value)\n
+ * @return None\n * @note Callback triggered after register write confirmation\n * @see DRV8305_PACK_CTRL05, drv8305_ctrl05_hs_gate_t\n
+ * */
+DRV8305_PUBLIC void drv8305_hs_gate_drive_register_handler(void *self, uint16_t data)
 {
     (void)self;  // Unused parameter
     (void)data;  // Unused parameter
@@ -130,4 +133,6 @@ DRV8305_PUBLIC void drv8305_voltage_regulator_register_handler(void *self, uint1
 DRV8305_PUBLIC void drv8305_vds_sense_register_handler(void *self, uint16_t data)
 {
     (void)self;  // Unused parameter
-    (void)data;  // Unused parameter}
+    (void)data;  // Unused parameter
+}
+
