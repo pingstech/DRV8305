@@ -170,6 +170,30 @@ DRV8305_PUBLIC void drv8305_confirm_configuration(void)
     drv8305_api_confirm_configuration(&user_drv8305_obj);
 }
 
+/**
+ * @brief Skip DRV8305 power-on state (application wrapper)
+ * @details Sets the main state to IDLE, bypassing the initial power-on sequence.
+ * @return None
+ * @note Use with caution; intended for advanced control or debugging.
+ */
+DRV8305_PUBLIC void drv8305_skip_power_on_state(void)
+{
+    &user_drv8305_obj.state.main_state = DRV8305_IDLE_STATE;
+}
+
+/**
+ * @brief Reset DRV8305 driver (application wrapper)
+ * @details Invokes hardware disable and sleep callbacks, then re-initializes the DRV8305 driver and reloads default configuration.
+ * @return None
+ * @note Use to reinitialize driver state after fault or configuration change. Hardware callbacks are called before reinitialization.
+ */
+DRV8305_PUBLIC void drv8305_reset(void)
+{
+    hardware_drv8305_io_disable_callback();
+    hardware_drv8305_sleep_io_disable_callback();
+    drv8305_api_initialize(&user_drv8305_obj);
+}
+
 // ============================================================================
 // HARDWARE I/O CALLBACKS - Implementation-specific GPIO and SPI control
 // ============================================================================

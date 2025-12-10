@@ -88,6 +88,24 @@ DRV8305_PUBLIC void drv8305_motor_run(void);
  */
 DRV8305_PUBLIC void drv8305_confirm_configuration(void);
 
+/**
+ * @brief Skip DRV8305 power-on initialization state
+ * @details Immediately transitions the driver state machine to IDLE state,
+ *          bypassing the default power-on initialization sequence.
+ *          Useful for applications that require rapid startup.
+ * @return None
+ * @note Modifies global user_drv8305_obj state directly
+ * @see drv8305_initialize(), drv8305_confirm_configuration()
+ */
+DRV8305_PUBLIC void drv8305_skip_power_on_state(void);
+
+/**
+ * @brief Reset DRV8305 driver and hardware I/O
+ * @details Disables DRV8305 gate drivers and sleep mode, then reinitializes
+ *          the driver state machine and configuration.
+ */
+DRV8305_PUBLIC void drv8305_reset(void);
+
 #ifdef __cplusplus
 }
 #endif
