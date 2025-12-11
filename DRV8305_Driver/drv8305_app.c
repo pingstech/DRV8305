@@ -28,11 +28,13 @@
  * DRV_WAKE: Sleep mode control (high=awake, low=sleep)
  */
 
+/* HARDWARE PLATFORM INCLUDES - TI C2000 DSP DriverLib and Board Support */
 #include "driverlib.h"
 #include "device.h"
 #include "board.h"
 #include "c2000ware_libraries.h"
 
+/* DRV8305 INCLUDES */
 #include "drv8305_macros.h"
 #include "DRV8305_Status_Registers/drv8305_status_registers_handlers.h"
 #include "DRV8305_Control_Registers/drv8305_control_registers_handlers.h"
@@ -178,7 +180,7 @@ DRV8305_PUBLIC void drv8305_confirm_configuration(void)
  */
 DRV8305_PUBLIC void drv8305_skip_power_on_state(void)
 {
-    &user_drv8305_obj.state.main_state = DRV8305_IDLE_STATE;
+    user_drv8305_obj.state.main_state = DRV8305_IDLE_STATE;
 }
 
 /**
