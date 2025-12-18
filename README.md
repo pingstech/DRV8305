@@ -179,8 +179,8 @@ void main(void)
     // 1. Initialize driver (must be called once)
     drv8305_initialize();
     
-    // 2. Enable driver
-    drv8305_motor_run();
+    // 2. Enable driver (Corrected function name)
+    drv8305_ic_enable();
     
     // 3. Configure timer interrupt (1ms)
     // Call drv8305_timer() from timer ISR
@@ -279,14 +279,22 @@ DRV8305_PUBLIC void drv8305_polling(void);
 DRV8305_PUBLIC void drv8305_timer(void);
 ```
 
-#### `drv8305_motor_run()` / `drv8305_motor_stop()`
+#### `drv8305_ic_enable()` / `drv8305_ic_disable()`
 ```c
 /**
- * @brief Enable DRV8305 gate drivers (motor ready)
- * @brief Disable DRV8305 gate drivers (motor stop)
+ * @brief Start motor (enable DRV8305 gate drivers)
+ * @brief Stop motor (disable DRV8305 gate drivers)
  */
-DRV8305_PUBLIC void drv8305_motor_run(void);
-DRV8305_PUBLIC void drv8305_motor_stop(void);
+DRV8305_PUBLIC void drv8305_ic_enable(void);
+DRV8305_PUBLIC void drv8305_ic_disable(void);
+```
+#### `drv8305_reset()`
+```c
+/**
+ * @brief Reset DRV8305 driver and hardware I/O
+ * @details Disables drivers, toggles sleep mode, and re-initializes the state machine.
+ */
+DRV8305_PUBLIC void drv8305_reset(void);
 ```
 
 #### `drv8305_confirm_configuration()`
@@ -336,6 +344,16 @@ DRV8305_PUBLIC drv8305_configuration_t* drv8305_get_configuration(void);
  * drv8305_confirm_configuration();  // Apply changes to IC
  */
 DRV8305_PUBLIC void drv8305_set_configuration(drv8305_configuration_t *cfg);
+```
+
+#### `drv8305_is_configuration_confirm()`
+```c
+/**
+ * @brief Check if DRV8305 configuration is confirmed
+ * @details Returns true if the configuration sent to the IC has been verified.
+ * @return bool True if confirmed, false otherwise
+ */
+DRV8305_PUBLIC bool drv8305_is_configuration_confirm(void);
 ```
 
 ---
