@@ -28,6 +28,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "drv8305_macros.h"
 #include "drv8305_register_map.h"
@@ -77,6 +78,7 @@ typedef enum
 
 typedef enum
 {
+    // CONTOL REGISTERS WRITE STATES
     DRV8305_SM_CONTROL_HS_GATE_DRIVE_REG,      // Control 0x05: HS Gate Drive Control
     DRV8305_SM_CONTROL_LS_GATE_DRIVE_REG,      // Control 0x06: LS Gate Drive Control
     DRV8305_SM_CONTROL_GATE_DRIVE_REG,         // Control 0x07: Gate Drive Control
@@ -85,16 +87,26 @@ typedef enum
     DRV8305_SM_CONTROL_VOLTAGE_REGULATOR_REG,  // Control 0x0B: Voltage Regulator Control
     DRV8305_SM_CONTROL_VDS_SENSE_REG,          // Control 0x0C: VDS Sense Control
     DRV8305_SM_CONTROL_CYCLE_DELAY,            // Delay state
+
+    // CONTOL REGISTERS READ STATES
+    DRV8305_SM_READ_CONTROL_HS_GATE_DRIVE_REG,      // Control 0x05: HS Gate Drive Control
+    DRV8305_SM_READ_CONTROL_LS_GATE_DRIVE_REG,      // Control 0x06: LS Gate Drive Control
+    DRV8305_SM_READ_CONTROL_GATE_DRIVE_REG,         // Control 0x07: Gate Drive Control
+    DRV8305_SM_READ_CONTROL_IC_OPERATION_REG,       // Control 0x09: IC Operation
+    DRV8305_SM_READ_CONTROL_SHUNT_AMPLIFIER_REG,    // Control 0x0A: Shunt Amplifier Control
+    DRV8305_SM_READ_CONTROL_VOLTAGE_REGULATOR_REG,  // Control 0x0B: Voltage Regulator Control
+    DRV8305_SM_READ_CONTROL_VDS_SENSE_REG,          // Control 0x0C: VDS Sense Control
+    DRV8305_SM_READ_CONTROL_CYCLE_DELAY,            // Delay state
 } drv8305_control_sm_state_e;
 
 typedef struct 
 {
-    void     (*drv8305_spi_transmit_cb) (uint16_t data);
-    uint16_t (*drv8305_spi_receive_cb)  (void);
-    void     (*drv8305_enable_io)       (void);
-    void     (*drv8305_disable_io)      (void);
-    void     (*drv8305_wake_up_io)      (void);
-    void     (*drv8305_sleep_io)        (void);
+    uint16_t (*drv8305_spi_write_and_read_from_register_cb) (uint16_t data);
+    bool     (*drv8305_get_fault_pin_status)                (void);
+    void     (*drv8305_enable_io)                           (void);
+    void     (*drv8305_disable_io)                          (void);
+    void     (*drv8305_wake_up_io)                          (void);
+    void     (*drv8305_sleep_io)                            (void);
 } drv8305_hardware_low_level_cb_t;
 
 typedef struct
@@ -148,6 +160,8 @@ typedef struct
     drv8305_hardware_low_level_cb_t hw_callbacks;
 
     drv8305_register_node_t         register_manager[DRV8305_NUMBER_OF_REGISTERS];
+
+    bool                            configuration_confirmed;
 } drv8305_user_object_t;
 
 /**
@@ -263,6 +277,15 @@ DRV8305_PUBLIC void drv8305_set_configuration(drv8305_configuration_t *cfg);
  * @see drv8305_api_initialize
  */
 DRV8305_PUBLIC void drv8305_api_confirm_configuration(drv8305_user_object_t *self);
+
+/**
+ * @brief Check if DRV8305 configuration is confirmed
+ * @details Returns the status of configuration confirmation flag.
+ *          Used to verify if control register settings have been acknowledged.
+ * @param[in,out] self Pointer to DRV8305 user object
+ * @return true if configuration is confirmed, false otherwise
+ */
+DRV8305_PUBLIC bool drv8305_api_is_configuration_confirm(drv8305_user_object_t * self);
 
 #ifdef __cplusplus
 }

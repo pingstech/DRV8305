@@ -27,6 +27,9 @@
 extern "C" {
 #endif
 
+
+#include <stdbool.h>
+
 #include "drv8305_macros.h"
 
 /**
@@ -60,22 +63,22 @@ DRV8305_PUBLIC void drv8305_timer(void);
 DRV8305_PUBLIC void drv8305_polling(void);
 
 /**
- * @brief Stop motor and disable DRV8305
- * @details Disables the DRV8305 gate drivers, stopping any motor operation.
+ * @brief Stop motor (disable DRV8305 gate drivers)
+ * @details Application-level convenience function to disable gate drivers.
+ *          Calls hardware disable callback to stop motor operation.
  * @return None
- * @note Wrapper for drv8305_api_ic_disable() with global user object
- * @see drv8305_api_ic_disable(), drv8305_motor_run()
+ * @see drv8305_ic_enable, drv8305_api_ic_disable
  */
-DRV8305_PUBLIC void drv8305_motor_stop(void);
+DRV8305_PUBLIC void drv8305_ic_disable(void);
 
 /**
- * @brief Enable DRV8305 and prepare for motor operation
- * @details Enables the DRV8305 gate drivers, ready for motor control.
+ * @brief Start motor (enable DRV8305 gate drivers)
+ * @details Application-level convenience function to enable gate drivers after
+ *          driver initialization and configuration is complete.
  * @return None
- * @note Wrapper for drv8305_api_ic_enable() with global user object
- * @see drv8305_api_ic_enable(), drv8305_motor_stop()
+ * @see drv8305_ic_disable, drv8305_api_ic_enable
  */
-DRV8305_PUBLIC void drv8305_motor_run(void);
+DRV8305_PUBLIC void drv8305_ic_enable(void);
 
 /**
  * @brief Confirm DRV8305 configuration completion
@@ -89,15 +92,13 @@ DRV8305_PUBLIC void drv8305_motor_run(void);
 DRV8305_PUBLIC void drv8305_confirm_configuration(void);
 
 /**
- * @brief Skip DRV8305 power-on initialization state
- * @details Immediately transitions the driver state machine to IDLE state,
- *          bypassing the default power-on initialization sequence.
- *          Useful for applications that require rapid startup.
- * @return None
- * @note Modifies global user_drv8305_obj state directly
- * @see drv8305_initialize(), drv8305_confirm_configuration()
+ * @brief Check if DRV8305 configuration is confirmed
+ * @details Calls the core API function to check configuration confirmation status.
+ * @return bool True if configuration is confirmed, false otherwise
+ * @note Wrapper function using global user_drv8305_obj instance
+ * @see drv8305_api_is_configuration_confirm(), drv8305_initialize()
  */
-DRV8305_PUBLIC void drv8305_skip_power_on_state(void);
+DRV8305_PUBLIC bool drv8305_is_configuration_confirm(void)
 
 /**
  * @brief Reset DRV8305 driver and hardware I/O

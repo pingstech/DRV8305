@@ -101,22 +101,25 @@ extern drv8305_configuration_t default_configuration;
  */
 DRV8305_PUBLIC void drv8305_api_initialize(drv8305_user_object_t *self)
 {
-    if(self                                       == NULL ||
-       self->hw_callbacks.drv8305_disable_io      == NULL ||
-       self->hw_callbacks.drv8305_enable_io       == NULL || 
-       self->hw_callbacks.drv8305_sleep_io        == NULL || 
-       self->hw_callbacks.drv8305_wake_up_io      == NULL || 
-       self->hw_callbacks.drv8305_spi_receive_cb  == NULL || 
-       self->hw_callbacks.drv8305_spi_transmit_cb == NULL) { return; }
-
-    self->state.cycle_time    = 0;
-    self->state.delay_time    = 0;
-    
-    self->state.status_state  = DRV8305_SM_STATUS_WARNING_REG;
-    self->state.control_state = DRV8305_SM_CONTROL_HS_GATE_DRIVE_REG;
+    if(self                                                            == NULL ||
+       self->hw_callbacks.drv8305_disable_io                           == NULL ||
+       self->hw_callbacks.drv8305_enable_io                            == NULL || 
+       self->hw_callbacks.drv8305_sleep_io                             == NULL || 
+       self->hw_callbacks.drv8305_wake_up_io                           == NULL ||
+       self->hw_callbacks.drv8305_get_fault_pin_status                 == NULL || 
+       self->hw_callbacks.drv8305_spi_write_and_read_from_register_cb  == NULL) { return; }    
 
     self->hw_callbacks.drv8305_wake_up_io();
     self->hw_callbacks.drv8305_disable_io();
+    
+    self->state.cycle_time    = 0;
+    self->state.delay_time    = 0;
+
+    self->configuration_confirmed = false;
+    
+    self->state.main_state    = DRV8305_IDLE_STATE;
+    self->state.status_state  = DRV8305_SM_STATUS_WARNING_REG;
+    self->state.control_state = DRV8305_SM_CONTROL_HS_GATE_DRIVE_REG;
 
     drv8305_configuration_t* temp_config = drv8305_get_configuration();
     
@@ -146,7 +149,7 @@ DRV8305_PUBLIC void drv8305_api_master_sm_polling(drv8305_user_object_t *self)
     {
         case DRV8305_INIT_STATE:
         {
-            self->hw_callbacks.drv8305_enable_io();
+            //self->hw_callbacks.drv8305_enable_io(); /**@brief: When the configuration is complete, DRV8305 may be enabled. Therefore this line has been removed! Use "drv8305_api_ic_enable()" after configuration is complete. */
             self->hw_callbacks.drv8305_wake_up_io();
             drv8305_main_sm_go_to_next_state(self, DRV8305_CONTROL_STATE, DRV8305_REGISTER_SWITCH_DELAY_MS);
 
@@ -267,7 +270,6 @@ DRV8305_PUBLIC void drv8305_set_configuration(drv8305_configuration_t *cfg)
     memcpy(&default_configuration, cfg, sizeof(drv8305_configuration_t));
 }
 
-
 /**
  * @brief Confirm configuration and start control register programming (implementation)
  * @details Transitions state machine to CONTROL_STATE to begin writing control registers.
@@ -277,7 +279,20 @@ DRV8305_PUBLIC void drv8305_set_configuration(drv8305_configuration_t *cfg)
  */
 DRV8305_PUBLIC void drv8305_api_confirm_configuration(drv8305_user_object_t *self)
 {
+    drv8305_control_sm_go_to_next_state(self, DRV8305_SM_CONTROL_HS_GATE_DRIVE_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);
     drv8305_main_sm_go_to_next_state(self, DRV8305_CONTROL_STATE, DRV8305_REGISTER_SWITCH_DELAY_MS);
+}
+
+/**
+ * @brief Check if DRV8305 configuration is confirmed
+ * @details Returns the status of configuration confirmation flag.
+ *          Used to verify if control register settings have been acknowledged.
+ * @param[in,out] self Pointer to DRV8305 user object
+ * @return true if configuration is confirmed, false otherwise
+ */
+DRV8305_PUBLIC bool drv8305_api_is_configuration_confirm(drv8305_user_object_t * self)
+{
+    return self->configuration_confirmed;
 }
 
 /* -------------------------------- PRIVATE FUNCTIONS -------------------------------- */
@@ -355,11 +370,13 @@ DRV8305_PRIVATE void drv8305_control_register_process_polling(drv8305_user_objec
 {
     switch (self->state.control_state)
     {
+        /**@brief: Control Register Write States */ 
+
         case DRV8305_SM_CONTROL_HS_GATE_DRIVE_REG:
         {
             self->register_manager[DRV8305_CONTROL_05_ARRAY_INDEX].data = drv8305_control_register_05_parser(self);
             self->register_manager[DRV8305_CONTROL_05_ARRAY_INDEX].data = drv8305_spi_write_command_process(self, self->register_manager[DRV8305_CONTROL_05_ARRAY_INDEX].type, self->register_manager[DRV8305_CONTROL_05_ARRAY_INDEX].data);
-            self->control_callbacks.drv8305_hs_gate_drive_control_register_cb(self, self->register_manager[DRV8305_CONTROL_05_ARRAY_INDEX].data);
+            
             drv8305_control_sm_go_to_next_state(self, DRV8305_SM_CONTROL_LS_GATE_DRIVE_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);
 
             break;
@@ -369,7 +386,7 @@ DRV8305_PRIVATE void drv8305_control_register_process_polling(drv8305_user_objec
         {
             self->register_manager[DRV8305_CONTROL_06_ARRAY_INDEX].data = drv8305_control_register_06_parser(self);
             self->register_manager[DRV8305_CONTROL_06_ARRAY_INDEX].data = drv8305_spi_write_command_process(self, self->register_manager[DRV8305_CONTROL_06_ARRAY_INDEX].type, self->register_manager[DRV8305_CONTROL_06_ARRAY_INDEX].data);
-            self->control_callbacks.drv8305_ls_gate_drive_control_register_cb(self, self->register_manager[DRV8305_CONTROL_06_ARRAY_INDEX].data);
+            
             drv8305_control_sm_go_to_next_state(self, DRV8305_SM_CONTROL_GATE_DRIVE_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);
 
             break;
@@ -379,7 +396,7 @@ DRV8305_PRIVATE void drv8305_control_register_process_polling(drv8305_user_objec
         {
             self->register_manager[DRV8305_CONTROL_07_ARRAY_INDEX].data = drv8305_control_register_07_parser(self);
             self->register_manager[DRV8305_CONTROL_07_ARRAY_INDEX].data = drv8305_spi_write_command_process(self, self->register_manager[DRV8305_CONTROL_07_ARRAY_INDEX].type, self->register_manager[DRV8305_CONTROL_07_ARRAY_INDEX].data);
-            self->control_callbacks.drv8305_gate_drive_control_register_cb(self, self->register_manager[DRV8305_CONTROL_07_ARRAY_INDEX].data);
+            
             drv8305_control_sm_go_to_next_state(self, DRV8305_SM_CONTROL_IC_OPERATION_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);
 
             break;
@@ -389,7 +406,7 @@ DRV8305_PRIVATE void drv8305_control_register_process_polling(drv8305_user_objec
         {
             self->register_manager[DRV8305_CONTROL_09_ARRAY_INDEX].data = drv8305_control_register_09_parser(self);
             self->register_manager[DRV8305_CONTROL_09_ARRAY_INDEX].data = drv8305_spi_write_command_process(self, self->register_manager[DRV8305_CONTROL_09_ARRAY_INDEX].type, self->register_manager[DRV8305_CONTROL_09_ARRAY_INDEX].data);
-            self->control_callbacks.drv8305_ic_operation_register_cb(self, self->register_manager[DRV8305_CONTROL_09_ARRAY_INDEX].data);
+            
             drv8305_control_sm_go_to_next_state(self, DRV8305_SM_CONTROL_SHUNT_AMPLIFIER_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);
 
             break;
@@ -399,7 +416,7 @@ DRV8305_PRIVATE void drv8305_control_register_process_polling(drv8305_user_objec
         {
             self->register_manager[DRV8305_CONTROL_0A_ARRAY_INDEX].data = drv8305_control_register_0A_parser(self);
             self->register_manager[DRV8305_CONTROL_0A_ARRAY_INDEX].data = drv8305_spi_write_command_process(self, self->register_manager[DRV8305_CONTROL_0A_ARRAY_INDEX].type, self->register_manager[DRV8305_CONTROL_0A_ARRAY_INDEX].data);
-            self->control_callbacks.drv8305_shunt_amplifier_control_register_cb(self, self->register_manager[DRV8305_CONTROL_0A_ARRAY_INDEX].data);
+            
             drv8305_control_sm_go_to_next_state(self, DRV8305_SM_CONTROL_VOLTAGE_REGULATOR_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);
 
             break;
@@ -409,7 +426,7 @@ DRV8305_PRIVATE void drv8305_control_register_process_polling(drv8305_user_objec
         {
             self->register_manager[DRV8305_CONTROL_0B_ARRAY_INDEX].data = drv8305_control_register_0B_parser(self);
             self->register_manager[DRV8305_CONTROL_0B_ARRAY_INDEX].data = drv8305_spi_write_command_process(self, self->register_manager[DRV8305_CONTROL_0B_ARRAY_INDEX].type, self->register_manager[DRV8305_CONTROL_0B_ARRAY_INDEX].data);
-            self->control_callbacks.drv8305_voltage_regulator_control_register_cb(self, self->register_manager[DRV8305_CONTROL_0B_ARRAY_INDEX].data);
+            
             drv8305_control_sm_go_to_next_state(self, DRV8305_SM_CONTROL_VDS_SENSE_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);    
 
             break;
@@ -419,12 +436,78 @@ DRV8305_PRIVATE void drv8305_control_register_process_polling(drv8305_user_objec
         {
             self->register_manager[DRV8305_CONTROL_0C_ARRAY_INDEX].data = drv8305_control_register_0C_parser(self);
             self->register_manager[DRV8305_CONTROL_0C_ARRAY_INDEX].data = drv8305_spi_write_command_process(self, self->register_manager[DRV8305_CONTROL_0C_ARRAY_INDEX].type, self->register_manager[DRV8305_CONTROL_0C_ARRAY_INDEX].data);
+            
+            drv8305_control_sm_go_to_next_state(self, DRV8305_SM_READ_CONTROL_HS_GATE_DRIVE_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);                
+
+            break;
+        }
+
+        /**@brief: Control Register Read States */ 
+
+        case DRV8305_SM_READ_CONTROL_HS_GATE_DRIVE_REG:
+        {
+            self->register_manager[DRV8305_CONTROL_05_ARRAY_INDEX].data = drv8305_spi_read_command_process(self, self->register_manager[DRV8305_CONTROL_05_ARRAY_INDEX].type);
+            self->control_callbacks.drv8305_hs_gate_drive_control_register_cb(self, self->register_manager[DRV8305_CONTROL_05_ARRAY_INDEX].data);
+            drv8305_control_sm_go_to_next_state(self, DRV8305_SM_READ_CONTROL_LS_GATE_DRIVE_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);
+
+            break;
+        }
+
+        case DRV8305_SM_READ_CONTROL_LS_GATE_DRIVE_REG:
+        {
+            self->register_manager[DRV8305_CONTROL_06_ARRAY_INDEX].data = drv8305_spi_read_command_process(self, self->register_manager[DRV8305_CONTROL_06_ARRAY_INDEX].type);
+            self->control_callbacks.drv8305_ls_gate_drive_control_register_cb(self, self->register_manager[DRV8305_CONTROL_06_ARRAY_INDEX].data);
+            drv8305_control_sm_go_to_next_state(self, DRV8305_SM_READ_CONTROL_GATE_DRIVE_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);
+
+            break;
+        }
+
+        case DRV8305_SM_READ_CONTROL_GATE_DRIVE_REG:
+        {
+            self->register_manager[DRV8305_CONTROL_07_ARRAY_INDEX].data = drv8305_spi_read_command_process(self, self->register_manager[DRV8305_CONTROL_07_ARRAY_INDEX].type);
+            self->control_callbacks.drv8305_gate_drive_control_register_cb(self, self->register_manager[DRV8305_CONTROL_07_ARRAY_INDEX].data);
+            drv8305_control_sm_go_to_next_state(self, DRV8305_SM_READ_CONTROL_IC_OPERATION_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);
+
+            break;
+        }
+
+        case DRV8305_SM_READ_CONTROL_IC_OPERATION_REG:
+        {
+            self->register_manager[DRV8305_CONTROL_09_ARRAY_INDEX].data = drv8305_spi_read_command_process(self, self->register_manager[DRV8305_CONTROL_09_ARRAY_INDEX].type);
+            self->control_callbacks.drv8305_ic_operation_register_cb(self, self->register_manager[DRV8305_CONTROL_09_ARRAY_INDEX].data);
+            drv8305_control_sm_go_to_next_state(self, DRV8305_SM_READ_CONTROL_SHUNT_AMPLIFIER_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);
+
+            break;
+        }
+
+        case DRV8305_SM_READ_CONTROL_SHUNT_AMPLIFIER_REG:
+        {
+            self->register_manager[DRV8305_CONTROL_0A_ARRAY_INDEX].data = drv8305_spi_read_command_process(self, self->register_manager[DRV8305_CONTROL_0A_ARRAY_INDEX].type);
+            self->control_callbacks.drv8305_shunt_amplifier_control_register_cb(self, self->register_manager[DRV8305_CONTROL_0A_ARRAY_INDEX].data);
+            drv8305_control_sm_go_to_next_state(self, DRV8305_SM_READ_CONTROL_VOLTAGE_REGULATOR_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);
+
+            break;
+        }
+
+        case DRV8305_SM_READ_CONTROL_VOLTAGE_REGULATOR_REG:
+        {
+            self->register_manager[DRV8305_CONTROL_0B_ARRAY_INDEX].data = drv8305_spi_read_command_process(self, self->register_manager[DRV8305_CONTROL_0B_ARRAY_INDEX].type);
+            self->control_callbacks.drv8305_voltage_regulator_control_register_cb(self, self->register_manager[DRV8305_CONTROL_0B_ARRAY_INDEX].data);
+            drv8305_control_sm_go_to_next_state(self, DRV8305_SM_READ_CONTROL_VDS_SENSE_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);
+
+            break;
+        }
+
+        case DRV8305_SM_READ_CONTROL_VDS_SENSE_REG:
+        {
+            self->register_manager[DRV8305_CONTROL_0C_ARRAY_INDEX].data = drv8305_spi_read_command_process(self, self->register_manager[DRV8305_CONTROL_0C_ARRAY_INDEX].type);
             self->control_callbacks.drv8305_vds_sense_control_register_cb(self, self->register_manager[DRV8305_CONTROL_0C_ARRAY_INDEX].data);
-            drv8305_control_sm_go_to_next_state(self, DRV8305_SM_CONTROL_HS_GATE_DRIVE_REG, DRV8305_REGISTER_SWITCH_DELAY_MS);    
+            
             drv8305_main_sm_go_to_next_state(self, DRV8305_IDLE_STATE, DRV8305_REGISTER_SWITCH_DELAY_MS);
 
             break;
         }
+
 
         case DRV8305_SM_CONTROL_CYCLE_DELAY:
         {
@@ -450,12 +533,10 @@ DRV8305_PRIVATE void drv8305_control_register_process_polling(drv8305_user_objec
  */
 DRV8305_PRIVATE uint16_t drv8305_spi_write_command_process(drv8305_user_object_t *self, drv8305_register_types_t drv8305_register, uint16_t data)
 {
-    uint16_t drv8305_tx_packet = drv8305_spi_write_packet_create(drv8305_register, data);
-    self->hw_callbacks.drv8305_spi_transmit_cb(drv8305_tx_packet);
+    uint16_t drv8305_write_packet = drv8305_spi_write_packet_create(drv8305_register, data);
+    uint16_t drv8305_read_packet = self->hw_callbacks.drv8305_spi_write_and_read_from_register_cb(drv8305_write_packet);
 
-    uint16_t drv8305_rx_packet = drv8305_spi_response_packet_create(self->hw_callbacks.drv8305_spi_receive_cb());
-
-    return drv8305_rx_packet;
+    return drv8305_read_packet;
 }
 
 /**
@@ -469,12 +550,10 @@ DRV8305_PRIVATE uint16_t drv8305_spi_write_command_process(drv8305_user_object_t
  */
 DRV8305_PRIVATE uint16_t drv8305_spi_read_command_process(drv8305_user_object_t *self, drv8305_register_types_t drv8305_register)
 {
-    uint16_t drv8305_tx_packet = drv8305_spi_read_packet_create(drv8305_register);
-    self->hw_callbacks.drv8305_spi_transmit_cb(drv8305_tx_packet);
+    uint16_t drv8305_write_packet = drv8305_spi_read_packet_create(drv8305_register);
+    uint16_t drv8305_read_packet = self->hw_callbacks.drv8305_spi_write_and_read_from_register_cb(drv8305_write_packet);
 
-    uint16_t drv8305_rx_packet = drv8305_spi_response_packet_create(self->hw_callbacks.drv8305_spi_receive_cb());
-
-    return drv8305_rx_packet;
+    return drv8305_read_packet;
 }
 
 /**
@@ -539,7 +618,7 @@ DRV8305_PRIVATE void drv8305_control_sm_go_to_next_state(drv8305_user_object_t *
  */
 DRV8305_PRIVATE uint16_t drv8305_spi_write_packet_create(drv8305_register_types_t register_type, uint16_t data)
 {
-    return ((register_type & 0x0F) << 11) | (data & 0x7FF);
+    return (((uint16_t)register_type & 0x0F) << 11) | ((uint16_t)data & 0x7FF);
 }
 
 /**
@@ -551,7 +630,7 @@ DRV8305_PRIVATE uint16_t drv8305_spi_write_packet_create(drv8305_register_types_
  */
 DRV8305_PRIVATE uint16_t drv8305_spi_read_packet_create(drv8305_register_types_t register_type)
 {
-    return (1 << 15) | ((register_type & 0x0F) << 11);
+    return (1 << 15) | (((uint16_t)register_type & 0x0F) << 11);
 }
 
 /**

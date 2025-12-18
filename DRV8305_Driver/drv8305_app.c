@@ -28,6 +28,8 @@
  * DRV_WAKE: Sleep mode control (high=awake, low=sleep)
  */
 
+#include <stdbool.h>
+
 /* HARDWARE PLATFORM INCLUDES - TI C2000 DSP DriverLib and Board Support */
 #include "driverlib.h"
 #include "device.h"
@@ -41,36 +43,36 @@
 #include "DRV8305_API/drv8305_api.h"
 #include "drv8305_app.h"
 
-DRV8305_PRIVATE void     hardware_drv8305_io_disable_callback       (void);
-DRV8305_PRIVATE void     hardware_drv8305_io_enable_callback        (void);
-DRV8305_PRIVATE void     hardware_drv8305_sleep_io_enable_callback  (void);
-DRV8305_PRIVATE void     hardware_drv8305_sleep_io_disable_callback (void);
-DRV8305_PRIVATE void     hardware_spi_transmit_callback             (uint16_t data);
-DRV8305_PRIVATE uint16_t hardware_spi_receive_callback              (void);
+DRV8305_PRIVATE void     hardware_drv8305_io_disable_callback               (void);
+DRV8305_PRIVATE void     hardware_drv8305_io_enable_callback                (void);
+DRV8305_PRIVATE void     hardware_drv8305_sleep_io_enable_callback          (void);
+DRV8305_PRIVATE void     hardware_drv8305_sleep_io_disable_callback         (void);
+DRV8305_PRIVATE bool     hardware_drv8305_get_fault_pin_status_callback     (void);
+DRV8305_PRIVATE uint16_t hardware_spi_write_and_read_from_register_callback (uint16_t data);
 
-DRV8305_PRIVATE void     drv8305_warning_callback                   (void *self, uint16_t data);
-DRV8305_PRIVATE void     drv8305_ov_vds_callback                    (void *self, uint16_t data);
-DRV8305_PRIVATE void     drv8305_ic_faults_callback                 (void *self, uint16_t data);
-DRV8305_PRIVATE void     drv8305_vgs_faults_callback                (void *self, uint16_t data);
+DRV8305_PRIVATE void     drv8305_warning_callback                           (void *self, uint16_t data);
+DRV8305_PRIVATE void     drv8305_ov_vds_callback                            (void *self, uint16_t data);
+DRV8305_PRIVATE void     drv8305_ic_faults_callback                         (void *self, uint16_t data);
+DRV8305_PRIVATE void     drv8305_vgs_faults_callback                        (void *self, uint16_t data);
 
-DRV8305_PRIVATE void     drv8305_hs_gate_drive_callback             (void *self, uint16_t data);
-DRV8305_PRIVATE void     drv8305_ls_gate_drive_callback             (void *self, uint16_t data);
-DRV8305_PRIVATE void     drv8305_gate_drive_callback                (void *self, uint16_t data);
-DRV8305_PRIVATE void     drv8305_ic_operation_callback              (void *self, uint16_t data);
-DRV8305_PRIVATE void     drv8305_shunt_amplifier_callback           (void *self, uint16_t data);
-DRV8305_PRIVATE void     drv8305_voltage_regulator_callback         (void *self, uint16_t data);
-DRV8305_PRIVATE void     drv8305_vds_sense_callback                 (void *self, uint16_t data);
+DRV8305_PRIVATE void     drv8305_hs_gate_drive_callback                     (void *self, uint16_t data);
+DRV8305_PRIVATE void     drv8305_ls_gate_drive_callback                     (void *self, uint16_t data);
+DRV8305_PRIVATE void     drv8305_gate_drive_callback                        (void *self, uint16_t data);
+DRV8305_PRIVATE void     drv8305_ic_operation_callback                      (void *self, uint16_t data);
+DRV8305_PRIVATE void     drv8305_shunt_amplifier_callback                   (void *self, uint16_t data);
+DRV8305_PRIVATE void     drv8305_voltage_regulator_callback                 (void *self, uint16_t data);
+DRV8305_PRIVATE void     drv8305_vds_sense_callback                         (void *self, uint16_t data);
 
 DRV8305_PRIVATE drv8305_user_object_t user_drv8305_obj =
 {
     .hw_callbacks =
     {
-        .drv8305_disable_io      = hardware_drv8305_io_disable_callback,
-        .drv8305_enable_io       = hardware_drv8305_io_enable_callback,
-        .drv8305_sleep_io        = hardware_drv8305_sleep_io_disable_callback,
-        .drv8305_wake_up_io      = hardware_drv8305_sleep_io_enable_callback,
-        .drv8305_spi_transmit_cb = hardware_spi_transmit_callback,
-        .drv8305_spi_receive_cb  = hardware_spi_receive_callback
+        .drv8305_disable_io                          = hardware_drv8305_io_disable_callback,
+        .drv8305_enable_io                           = hardware_drv8305_io_enable_callback,
+        .drv8305_sleep_io                            = hardware_drv8305_sleep_io_disable_callback,
+        .drv8305_wake_up_io                          = hardware_drv8305_sleep_io_enable_callback,
+        .drv8305_get_fault_pin_status                = hardware_drv8305_get_fault_pin_status_callback,
+        .drv8305_spi_write_and_read_from_register_cb = hardware_spi_write_and_read_from_register_callback
     },
 
     .status_callbacks = 
@@ -135,12 +137,12 @@ DRV8305_PUBLIC void drv8305_timer(void)
 
 /**
  * @brief Stop motor (disable DRV8305 gate drivers)
- * @details Application-level convenience function to immediately disable all gate drivers.
- *          Halts PWM output to MOSFETs causing motor to coast/freewheel.
+ * @details Application-level convenience function to disable gate drivers.
+ *          Calls hardware disable callback to stop motor operation.
  * @return None
- * @see drv8305_motor_run, drv8305_api_ic_disable
+ * @see drv8305_ic_enable, drv8305_api_ic_disable
  */
-DRV8305_PUBLIC void drv8305_motor_stop(void)
+DRV8305_PUBLIC void drv8305_ic_disable(void)
 {
     drv8305_api_ic_disable(&user_drv8305_obj);
 }
@@ -150,9 +152,9 @@ DRV8305_PUBLIC void drv8305_motor_stop(void)
  * @details Application-level convenience function to enable gate drivers after
  *          driver initialization and configuration is complete.
  * @return None
- * @see drv8305_motor_stop, drv8305_api_ic_enable
+ * @see drv8305_ic_disable, drv8305_api_ic_enable
  */
-DRV8305_PUBLIC void drv8305_motor_run(void)
+DRV8305_PUBLIC void drv8305_ic_enable(void)
 {
     drv8305_api_ic_enable(&user_drv8305_obj);
 }
@@ -173,14 +175,15 @@ DRV8305_PUBLIC void drv8305_confirm_configuration(void)
 }
 
 /**
- * @brief Skip DRV8305 power-on state (application wrapper)
- * @details Sets the main state to IDLE, bypassing the initial power-on sequence.
- * @return None
- * @note Use with caution; intended for advanced control or debugging.
+ * @brief Check if DRV8305 configuration is confirmed (application wrapper)
+ * @details Calls the core API function to check configuration confirmation status.
+ * @return bool True if configuration is confirmed, false otherwise
+ * @note Wrapper function using global user_drv8305_obj instance
+ * @see drv8305_api_is_configuration_confirm(), drv8305_initialize()
  */
-DRV8305_PUBLIC void drv8305_skip_power_on_state(void)
+DRV8305_PUBLIC bool drv8305_is_configuration_confirm(void)
 {
-    user_drv8305_obj.state.main_state = DRV8305_IDLE_STATE;
+    return drv8305_api_is_configuration_confirm(&user_drv8305_obj);
 }
 
 /**
@@ -211,7 +214,7 @@ DRV8305_PUBLIC void drv8305_reset(void)
  */
 DRV8305_PRIVATE void hardware_drv8305_io_disable_callback(void)
 {
-    GPIO_writePin(EN_GATE, 0);
+    EN_GATE_DISABLE
 }
 
 /**
@@ -225,7 +228,7 @@ DRV8305_PRIVATE void hardware_drv8305_io_disable_callback(void)
  */
 DRV8305_PRIVATE void hardware_drv8305_io_enable_callback(void)
 {
-    GPIO_writePin(EN_GATE, 1);
+    EN_GATE_ENABLE
 }
 
 /**
@@ -239,7 +242,7 @@ DRV8305_PRIVATE void hardware_drv8305_io_enable_callback(void)
  */
 DRV8305_PRIVATE void hardware_drv8305_sleep_io_enable_callback(void)
 {
-    GPIO_writePin(DRV_WAKE, 1);
+    DRV_WAKE_ENABLE
 }
 
 /**
@@ -253,38 +256,43 @@ DRV8305_PRIVATE void hardware_drv8305_sleep_io_enable_callback(void)
  */
 DRV8305_PRIVATE void hardware_drv8305_sleep_io_disable_callback(void)
 {    
-    GPIO_writePin(DRV_WAKE, 0);
+    DRV_WAKE_DISABLE
+}
+
+/**
+ * @brief Get DRV8305 FAULT pin status (hardware callback)
+ * @details Reads the FAULT pin GPIO status to determine if a fault condition exists.
+ *          Uses processor-specific GPIO function: GPIO_readPin()
+ * @return bool True if FAULT pin is high (no fault), False if low (fault present)
+ * @note Internal callback - mapped to hw_callbacks.drv8305_get_fault_pin_status
+ * @processor_specific Uses GPIO_readPin() from TI C2000 DSP GPIO library
+ * @see GPIO_readPin(), FAULT_PIN_STATUS (pin definition in board.h)
+ */
+DRV8305_PRIVATE bool hardware_drv8305_get_fault_pin_status_callback(void)
+{
+    return FAULT_PIN_STATUS
 }
 
 /**
  * @brief Transmit SPI command packet (hardware callback)
  * @details Sends 16-bit command packet to DRV8305 via SPI in blocking mode.
- *          Uses processor-specific SPI function: SPI_writeDataBlockingFIFO()
+ *          Uses processor-specific SPI function: SPI_transmit16Bits()
  * @param[in] data SPI packet data to transmit
  * @return None
  * @note Internal callback - mapped to hw_callbacks.drv8305_spi_transmit_cb
- * @processor_specific Uses SPI_writeDataBlockingFIFO() from TI C2000 DSP SPI library
+ * @processor_specific Uses SPI_transmit16Bits() from TI C2000 DSP SPI library
  *                     SPI bus: SPIA (16-bit blocking FIFO mode)
- * @see SPI_writeDataBlockingFIFO(), SPIA_BASE (SPI configuration in device.h)
+ * @see SPI_transmit16Bits(), SPIA_BASE (SPI configuration in device.h)
  */
-DRV8305_PRIVATE void hardware_spi_transmit_callback(uint16_t data)
+DRV8305_PRIVATE uint16_t hardware_spi_write_and_read_from_register_callback(uint16_t data)
 {
-    SPI_writeDataBlockingFIFO(SPIA_BASE, data);
-}
+    uint16_t read_data = 0;
 
-/**
- * @brief Receive SPI response packet (hardware callback)
- * @details Reads 16-bit response packet from DRV8305 via SPI in blocking mode.
- *          Uses processor-specific SPI function: SPI_readDataBlockingFIFO()
- * @return uint16_t SPI response packet data
- * @note Internal callback - mapped to hw_callbacks.drv8305_spi_receive_cb
- * @processor_specific Uses SPI_readDataBlockingFIFO() from TI C2000 DSP SPI library
- *                     SPI bus: SPIA (16-bit blocking FIFO mode)
- * @see SPI_readDataBlockingFIFO(), SPIA_BASE (SPI configuration in device.h)
- */
-DRV8305_PRIVATE uint16_t hardware_spi_receive_callback(void)
-{
-    return SPI_readDataBlockingFIFO(SPIA_BASE);
+    CS_LOW
+    read_data = SPI_transmit16Bits(SPIA_BASE, data);
+    CS_HIGH
+
+    return read_data;
 }
 
 // ============================================================================

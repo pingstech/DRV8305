@@ -26,10 +26,13 @@
  */
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "drv8305_macros.h"
+#include "drv8305_control_registers_handlers.h"
 #include "drv8305_control_registers_definitions.h"
 #include "drv8305_control_registers_handlers.h"
+
 
 /* --------------------------- CONTROL REGISTERS HANDLERS --------------------------- */
 
@@ -42,8 +45,24 @@
  * */
 DRV8305_PUBLIC void drv8305_hs_gate_drive_register_handler(void *self, uint16_t data)
 {
-    (void)self;  // Unused parameter
-    (void)data;  // Unused parameter
+    if(!self) { return; }
+
+    drv8305_user_object_t *user_obj = (drv8305_user_object_t *)self;
+
+    uint16_t tdrive  = (data & DRV8305_CTRL05_CTRL06_TDRIVE_MASK)  >> 8;
+    uint16_t isink   = (data & DRV8305_CTRL05_CTRL06_ISINK_MASK)   >> 4;
+    uint16_t isource = (data & DRV8305_CTRL05_CTRL06_ISOURCE_MASK) >> 0;    
+
+    if (tdrive  == user_obj->config.hs_gate_drive.tdrive &&
+        isink   == user_obj->config.hs_gate_drive.isink  &&
+        isource == user_obj->config.hs_gate_drive.isource)
+    {
+        self->configuration_confirmed = true;
+    }
+    else
+    {
+        self->configuration_confirmed = false;
+    }
 }
 
 /**
@@ -57,8 +76,24 @@ DRV8305_PUBLIC void drv8305_hs_gate_drive_register_handler(void *self, uint16_t 
  */
 DRV8305_PUBLIC void drv8305_ls_gate_drive_register_handler(void *self, uint16_t data)
 {
-    (void)self;  // Unused parameter
-    (void)data;  // Unused parameter
+    if(!self) { return; }
+
+    drv8305_user_object_t *user_obj = (drv8305_user_object_t *)self;
+
+    uint16_t tdrive  = (data & DRV8305_CTRL05_CTRL06_TDRIVE_MASK)  >> 8;
+    uint16_t isink   = (data & DRV8305_CTRL05_CTRL06_ISINK_MASK)   >> 4;
+    uint16_t isource = (data & DRV8305_CTRL05_CTRL06_ISOURCE_MASK) >> 0; 
+
+    if (tdrive  == user_obj->config.ls_gate_drive.tdrive &&
+        isink   == user_obj->config.ls_gate_drive.isink  &&
+        isource == user_obj->config.ls_gate_drive.isource)
+    {
+        self->configuration_confirmed = true;
+    }
+    else
+    {
+        self->configuration_confirmed = false;
+    }
 }
 
 /**
@@ -72,8 +107,30 @@ DRV8305_PUBLIC void drv8305_ls_gate_drive_register_handler(void *self, uint16_t 
  */
 DRV8305_PUBLIC void drv8305_gate_drive_register_handler(void *self, uint16_t data)
 {
-    (void)self;  // Unused parameter
-    (void)data;  // Unused parameter
+    if(!self) { return; }
+
+    drv8305_user_object_t *user_obj = (drv8305_user_object_t *)self;
+
+    uint16_t vcph_freq    = (data & DRV8305_CTRL07_VCPH_FREQ_MASK)   >> 10;
+    uint16_t comm_option  = (data & DRV8305_CTRL07_COMM_OPTION_MASK) >> 9;
+    uint16_t pwm_mode     = (data & DRV8305_CTRL07_PWM_MODE_MASK)    >> 7;
+    uint16_t dead_time    = (data & DRV8305_CTRL07_DEAD_TIME_MASK)   >> 4;
+    uint16_t tblank       = (data & DRV8305_CTRL07_TBLANK_MASK)      >> 2;
+    uint16_t tvds         = (data & DRV8305_CTRL07_TVDS_MASK)        >> 0;    
+
+    if (vcph_freq    == user_obj->config.gate_drive.vcph_freq &&
+        comm_option  == user_obj->config.gate_drive.comm_option &&
+        pwm_mode     == user_obj->config.gate_drive.pwm_mode &&
+        dead_time    == user_obj->config.gate_drive.dead_time &&
+        tblank       == user_obj->config.gate_drive.tblank &&
+        tvds         == user_obj->config.gate_drive.tvds)
+    {
+        self->configuration_confirmed = true;
+    }
+    else
+    {
+        self->configuration_confirmed = false;
+    }
 }
 
 /**
@@ -87,8 +144,38 @@ DRV8305_PUBLIC void drv8305_gate_drive_register_handler(void *self, uint16_t dat
  */
 DRV8305_PUBLIC void drv8305_ic_operation_register_handler(void *self, uint16_t data)
 {
-    (void)self;  // Unused parameter
-    (void)data;  // Unused parameter
+    if(!self) { return; }
+
+    drv8305_user_object_t *user_obj = (drv8305_user_object_t *)self;
+
+    uint16_t flip_otsd       = (data & DRV8305_CTRL09_FLIP_OTSD_MASK)      >> 10;
+    uint16_t dis_pvdd_uvlo2  = (data & DRV8305_CTRL09_DIS_PVDD_UVLO2_MASK) >> 9;
+    uint16_t dis_gdrv_fault  = (data & DRV8305_CTRL09_DIS_GDRV_FAULT_MASK) >> 8;
+    uint16_t en_sns_clamp    = (data & DRV8305_CTRL09_EN_SNS_CLAMP_MASK)   >> 7;
+    uint16_t wd_dly          = (data & DRV8305_CTRL09_WD_DLY_MASK)         >> 5;
+    uint16_t dis_sns_ocp     = (data & DRV8305_CTRL09_DIS_SNS_OCP_MASK)    >> 4;
+    uint16_t wd_en           = (data & DRV8305_CTRL09_WD_EN_MASK)          >> 3;
+    uint16_t sleep           = (data & DRV8305_CTRL09_SLEEP_MASK)          >> 2;
+    uint16_t clr_flts        = (data & DRV8305_CTRL09_CLR_FLTS_MASK)       >> 1;
+    uint16_t set_vcph_uv     = (data & DRV8305_CTRL09_SET_VCPH_UV_MASK)    >> 0;   
+
+    if(flip_otsd      == user_obj->config.ic_operation.flip_otsd      &&
+       dis_pvdd_uvlo2 == user_obj->config.ic_operation.dis_pvdd_uvlo2 &&
+       dis_gdrv_fault == user_obj->config.ic_operation.dis_gdrv_fault &&
+       en_sns_clamp   == user_obj->config.ic_operation.en_sns_clamp   &&
+       wd_dly         == user_obj->config.ic_operation.wd_dly         &&
+       dis_sns_ocp    == user_obj->config.ic_operation.dis_sns_ocp    &&
+       wd_en          == user_obj->config.ic_operation.wd_en          &&
+       sleep          == user_obj->config.ic_operation.sleep          &&
+       clr_flts       == user_obj->config.ic_operation.clr_flts       &&
+       set_vcph_uv    == user_obj->config.ic_operation.set_vcph_uv)
+    {
+        self->configuration_confirmed = true;
+    }
+    else
+    {
+        self->configuration_confirmed = false;
+    }   
 }
 
 /**
@@ -102,8 +189,32 @@ DRV8305_PUBLIC void drv8305_ic_operation_register_handler(void *self, uint16_t d
  */
 DRV8305_PUBLIC void drv8305_shunt_amplifier_register_handler(void *self, uint16_t data)
 {
-    (void)self;  // Unused parameter
-    (void)data;  // Unused parameter
+    if(!self) { return; }
+
+    drv8305_user_object_t *user_obj = (drv8305_user_object_t *)self;
+
+    uint16_t dc_cal_ch3  = (data & DRV8305_CTRL0A_DC_CAL_CH3_MASK) >> 10;
+    uint16_t dc_cal_ch2  = (data & DRV8305_CTRL0A_DC_CAL_CH2_MASK) >> 9;
+    uint16_t dc_cal_ch1  = (data & DRV8305_CTRL0A_DC_CAL_CH1_MASK) >> 8;
+    uint16_t cs_blank    = (data & DRV8305_CTRL0A_CS_BLANK_MASK)   >> 6;
+    uint16_t gain_cs3    = (data & DRV8305_CTRL0A_GAIN_CH3_MASK)   >> 4;
+    uint16_t gain_cs2    = (data & DRV8305_CTRL0A_GAIN_CH2_MASK)   >> 2;
+    uint16_t gain_cs1    = (data & DRV8305_CTRL0A_GAIN_CH1_MASK)   >> 0;
+
+    if(dc_cal_ch3  == user_obj->config.shunt_amplifier.dc_cal_ch3 &&
+       dc_cal_ch2  == user_obj->config.shunt_amplifier.dc_cal_ch2 &&
+       dc_cal_ch1  == user_obj->config.shunt_amplifier.dc_cal_ch1 &&
+       cs_blank    == user_obj->config.shunt_amplifier.cs_blank   &&
+       gain_cs3    == user_obj->config.shunt_amplifier.gain_cs3   &&
+       gain_cs2    == user_obj->config.shunt_amplifier.gain_cs2   &&
+       gain_cs1    == user_obj->config.shunt_amplifier.gain_cs1)
+    {
+        self->configuration_confirmed = true;
+    }
+    else
+    {
+        self->configuration_confirmed = false;
+    }
 }
 
 /**
@@ -117,8 +228,26 @@ DRV8305_PUBLIC void drv8305_shunt_amplifier_register_handler(void *self, uint16_
  */
 DRV8305_PUBLIC void drv8305_voltage_regulator_register_handler(void *self, uint16_t data)
 {
-    (void)self;  // Unused parameter
-    (void)data;  // Unused parameter
+    if(!self) { return; }
+
+    drv8305_user_object_t *user_obj = (drv8305_user_object_t *)self;
+
+    uint16_t vref_scale      = (data & DRV8305_CTRL0B_VREF_SCALE_MASK)     >> 8;
+    uint16_t sleep_dly       = (data & DRV8305_CTRL0B_SLEEP_DELAY_MASK)    >> 3;
+    uint16_t dis_vreg_pwrgd  = (data & DRV8305_CTRL0B_DIS_VREG_PWRGD_MASK) >> 2;
+    uint16_t vreg_uv_level   = (data & DRV8305_CTRL0B_VREG_UV_LEVEL_MASK)  >> 0;
+
+    if(vref_scale     == user_obj->config.voltage_regulator.vref_scale     &&
+       sleep_dly      == user_obj->config.voltage_regulator.sleep_dly      &&
+       dis_vreg_pwrgd == user_obj->config.voltage_regulator.dis_vreg_pwrgd &&
+       vreg_uv_level  == user_obj->config.voltage_regulator.vreg_uv_level)
+    {
+        self->configuration_confirmed = true;
+    }
+    else
+    {
+        self->configuration_confirmed = false;
+    }
 }
 
 /**
@@ -132,7 +261,21 @@ DRV8305_PUBLIC void drv8305_voltage_regulator_register_handler(void *self, uint1
  */
 DRV8305_PUBLIC void drv8305_vds_sense_register_handler(void *self, uint16_t data)
 {
-    (void)self;  // Unused parameter
-    (void)data;  // Unused parameter
+    if(!self) { return; }
+
+    drv8305_user_object_t *user_obj = (drv8305_user_object_t *)self;
+
+    uint16_t vds_level = (data & DRV8305_CTRL0C_VDS_LEVEL_MASK) >> 3;
+    uint16_t vds_mode  = (data & DRV8305_CTRL0C_VDS_MODE_MASK)  >> 0;
+
+    if(vds_level == user_obj->config.vds_sense.vds_level &&
+       vds_mode  == user_obj->config.vds_sense.vds_mode)
+    {
+        self->configuration_confirmed = true;
+    }
+    else
+    {
+        self->configuration_confirmed = false;
+    }
 }
 
