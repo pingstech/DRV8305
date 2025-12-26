@@ -47,8 +47,8 @@ DRV8305_PUBLIC drv8305_configuration_t default_configuration =
     .hs_gate_drive = 
     {
         .tdrive  = DRV8305_TDRIVE_1780NS,    // Bits 9:8  - Default: 1780 ns
-        .isink   = DRV8305_HS_ISINK_60MA,    // Bits 7:4  - Default: 60 mA
-        .isource = DRV8305_HS_ISOURCE_50MA   // Bits 3:0  - Default: 50 mA
+        .isink   = DRV8305_ISINK_60MA,       // Bits 7:4  - Default: 60 mA
+        .isource = DRV8305_ISOURCE_50MA      // Bits 3:0  - Default: 50 mA
     },
 
     /* -----------------------------------------------------------------------
@@ -59,8 +59,8 @@ DRV8305_PUBLIC drv8305_configuration_t default_configuration =
     .ls_gate_drive = 
     {
         .tdrive  = DRV8305_TDRIVE_1780NS,    // Bits 9:8  - Default: 1780 ns
-        .isink   = DRV8305_HS_ISINK_60MA,    // Bits 7:4  - Default: 60 mA
-        .isource = DRV8305_HS_ISOURCE_50MA   // Bits 3:0  - Default: 50 mA
+        .isink   = DRV8305_ISINK_60MA,       // Bits 7:4  - Default: 60 mA
+        .isource = DRV8305_ISOURCE_50MA      // Bits 3:0  - Default: 50 mA
     },
 
     /* -----------------------------------------------------------------------

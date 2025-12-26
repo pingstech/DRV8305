@@ -98,7 +98,7 @@ DRV8305_PUBLIC void drv8305_confirm_configuration(void);
  * @note Wrapper function using global user_drv8305_obj instance
  * @see drv8305_api_is_configuration_confirm(), drv8305_initialize()
  */
-DRV8305_PUBLIC bool drv8305_is_configuration_confirm(void)
+DRV8305_PUBLIC bool drv8305_is_configuration_confirm(void);
 
 /**
  * @brief Reset DRV8305 driver and hardware I/O

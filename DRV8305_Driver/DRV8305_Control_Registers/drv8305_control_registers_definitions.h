@@ -68,18 +68,18 @@ typedef enum
  */
 typedef enum 
 {
-    DRV8305_HS_ISINK_20MA   = 0x0U,  // 20 mA
-    DRV8305_HS_ISINK_30MA   = 0x1U,  // 30 mA
-    DRV8305_HS_ISINK_40MA   = 0x2U,  // 40 mA
-    DRV8305_HS_ISINK_50MA   = 0x3U,  // 50 mA
-    DRV8305_HS_ISINK_60MA   = 0x4U,  // 60 mA (Default)
-    DRV8305_HS_ISINK_70MA   = 0x5U,  // 70 mA
-    DRV8305_HS_ISINK_80MA   = 0x6U,  // 80 mA
-    DRV8305_HS_ISINK_250MA  = 0x7U,  // 0.25 A
-    DRV8305_HS_ISINK_500MA  = 0x8U,  // 0.50 A
-    DRV8305_HS_ISINK_750MA  = 0x9U,  // 0.75 A
-    DRV8305_HS_ISINK_1000MA = 0xAU,  // 1.00 A
-    DRV8305_HS_ISINK_1250MA = 0xBU   // 1.25 A
+    DRV8305_ISINK_20MA   = 0x0U,  // 20 mA
+    DRV8305_ISINK_30MA   = 0x1U,  // 30 mA
+    DRV8305_ISINK_40MA   = 0x2U,  // 40 mA
+    DRV8305_ISINK_50MA   = 0x3U,  // 50 mA
+    DRV8305_ISINK_60MA   = 0x4U,  // 60 mA (Default)
+    DRV8305_ISINK_70MA   = 0x5U,  // 70 mA
+    DRV8305_ISINK_80MA   = 0x6U,  // 80 mA
+    DRV8305_ISINK_250MA  = 0x7U,  // 0.25 A
+    DRV8305_ISINK_500MA  = 0x8U,  // 0.50 A
+    DRV8305_ISINK_750MA  = 0x9U,  // 0.75 A
+    DRV8305_ISINK_1000MA = 0xAU,  // 1.00 A
+    DRV8305_ISINK_1250MA = 0xBU   // 1.25 A
     // 0xC-0xF = 60 mA (per datasheet)
 } drv8305_hs_isink_t;
 
@@ -89,18 +89,18 @@ typedef enum
  */
 typedef enum 
 {
-    DRV8305_HS_ISOURCE_10MA   = 0x0U,  // 10 mA
-    DRV8305_HS_ISOURCE_20MA   = 0x1U,  // 20 mA
-    DRV8305_HS_ISOURCE_30MA   = 0x2U,  // 30 mA
-    DRV8305_HS_ISOURCE_40MA   = 0x3U,  // 40 mA
-    DRV8305_HS_ISOURCE_50MA   = 0x4U,  // 50 mA (Default)
-    DRV8305_HS_ISOURCE_60MA   = 0x5U,  // 60 mA
-    DRV8305_HS_ISOURCE_70MA   = 0x6U,  // 70 mA
-    DRV8305_HS_ISOURCE_125MA  = 0x7U,  // 0.125 A
-    DRV8305_HS_ISOURCE_250MA  = 0x8U,  // 0.25 A
-    DRV8305_HS_ISOURCE_500MA  = 0x9U,  // 0.50 A
-    DRV8305_HS_ISOURCE_750MA  = 0xAU,  // 0.75 A
-    DRV8305_HS_ISOURCE_1000MA = 0xBU   // 1.00 A
+    DRV8305_ISOURCE_10MA   = 0x0U,  // 10 mA
+    DRV8305_ISOURCE_20MA   = 0x1U,  // 20 mA
+    DRV8305_ISOURCE_30MA   = 0x2U,  // 30 mA
+    DRV8305_ISOURCE_40MA   = 0x3U,  // 40 mA
+    DRV8305_ISOURCE_50MA   = 0x4U,  // 50 mA (Default)
+    DRV8305_ISOURCE_60MA   = 0x5U,  // 60 mA
+    DRV8305_ISOURCE_70MA   = 0x6U,  // 70 mA
+    DRV8305_ISOURCE_125MA  = 0x7U,  // 0.125 A
+    DRV8305_ISOURCE_250MA  = 0x8U,  // 0.25 A
+    DRV8305_ISOURCE_500MA  = 0x9U,  // 0.50 A
+    DRV8305_ISOURCE_750MA  = 0xAU,  // 0.75 A
+    DRV8305_ISOURCE_1000MA = 0xBU   // 1.00 A
     // 0xC-0xF = 50 mA (per datasheet)
 } drv8305_hs_isource_t;
 
@@ -289,24 +289,52 @@ typedef enum
  * ------------------------------------------------------------------------- */
 
 /**
- * @brief VDS comparator threshold levels
+ * @brief VDS comparator threshold levels (full table)
  * Datasheet Reference: Table 20, Bits 7:3
- * Note: Only showing key values, see datasheet for full 32-level table
  */
-typedef enum 
+typedef enum
 {
-    DRV8305_VDS_0_060V = 0x00U,  // 60 mV
-    DRV8305_VDS_0_086V = 0x03U,  // 86 mV
-    DRV8305_VDS_0_155V = 0x08U,  // 155 mV
-    DRV8305_VDS_0_250V = 0x0CU,  // 250 mV
-    DRV8305_VDS_0_403V = 0x10U,  // 403 mV
-    DRV8305_VDS_0_648V = 0x14U,  // 648 mV
-    DRV8305_VDS_1_043V = 0x18U,  // 1.043 V
-    DRV8305_VDS_1_175V = 0x19U,  // 1.175 V (Default)
-    DRV8305_VDS_1_679V = 0x1CU,  // 1.679 V
-    DRV8305_VDS_2_131V = 0x1EU   // 2.131 V (Max)
-    // 0x1F = Same as 0x1E
+    DRV8305_VDS_0_060V = 0x00U, // 0.060 V
+    DRV8305_VDS_0_068V = 0x01U, // 0.068 V
+    DRV8305_VDS_0_076V = 0x02U, // 0.076 V
+    DRV8305_VDS_0_086V = 0x03U, // 0.086 V
+
+    DRV8305_VDS_0_097V = 0x04U, // 0.097 V
+    DRV8305_VDS_0_109V = 0x05U, // 0.109 V
+    DRV8305_VDS_0_123V = 0x06U, // 0.123 V
+    DRV8305_VDS_0_138V = 0x07U, // 0.138 V
+
+    DRV8305_VDS_0_155V = 0x08U, // 0.155 V
+    DRV8305_VDS_0_175V = 0x09U, // 0.175 V
+    DRV8305_VDS_0_197V = 0x0AU, // 0.197 V
+    DRV8305_VDS_0_222V = 0x0BU, // 0.222 V
+
+    DRV8305_VDS_0_250V = 0x0CU, // 0.250 V
+    DRV8305_VDS_0_282V = 0x0DU, // 0.282 V
+    DRV8305_VDS_0_317V = 0x0EU, // 0.317 V
+    DRV8305_VDS_0_358V = 0x0FU, // 0.358 V
+
+    DRV8305_VDS_0_403V = 0x10U, // 0.403 V
+    DRV8305_VDS_0_454V = 0x11U, // 0.454 V
+    DRV8305_VDS_0_511V = 0x12U, // 0.511 V
+    DRV8305_VDS_0_576V = 0x13U, // 0.576 V
+
+    DRV8305_VDS_0_648V = 0x14U, // 0.648 V
+    DRV8305_VDS_0_730V = 0x15U, // 0.730 V
+    DRV8305_VDS_0_822V = 0x16U, // 0.822 V
+    DRV8305_VDS_0_926V = 0x17U, // 0.926 V
+
+    DRV8305_VDS_1_043V = 0x18U, // 1.043 V
+    DRV8305_VDS_1_175V = 0x19U, // 1.175 V (Default)
+    DRV8305_VDS_1_324V = 0x1AU, // 1.324 V
+    DRV8305_VDS_1_491V = 0x1BU, // 1.491 V
+
+    DRV8305_VDS_1_679V = 0x1CU, // 1.679 V
+    DRV8305_VDS_1_892V = 0x1DU, // 1.892 V
+    DRV8305_VDS_2_131V = 0x1EU, // 2.131 V
+    DRV8305_VDS_2_131V_DUP = 0x1FU // 2.131 V (same as 0x1E)
 } drv8305_vds_level_t;
+
 
 /**
  * @brief VDS overcurrent response mode

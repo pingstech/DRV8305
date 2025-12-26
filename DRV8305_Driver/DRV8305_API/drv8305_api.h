@@ -41,62 +41,60 @@ extern "C" {
 typedef enum
 {
     // Status registers (read-only)
-    DRV8305_STATUS_01  = DRV8305_STATUS_01_REG_ADDR,    // warning
-    DRV8305_STATUS_02  = DRV8305_STATUS_02_REG_ADDR,    // ov_vds_faults
-    DRV8305_STATUS_03  = DRV8305_STATUS_03_REG_ADDR,    // ic_faults
-    DRV8305_STATUS_04  = DRV8305_STATUS_04_REG_ADDR,    // vgs_faults
+    DRV8305_STATUS_01  = DRV8305_STATUS_01_REG_ADDR, // warning
+    DRV8305_STATUS_02  = DRV8305_STATUS_02_REG_ADDR, // ov_vds_faults
+    DRV8305_STATUS_03  = DRV8305_STATUS_03_REG_ADDR, // ic_faults
+    DRV8305_STATUS_04  = DRV8305_STATUS_04_REG_ADDR, // vgs_faults
 
     // Control registers (read/write)
-    DRV8305_CONTROL_05 = DRV8305_CONTROL_05_REG_ADDR,   // HS Gate Drive Control
-    DRV8305_CONTROL_06 = DRV8305_CONTROL_06_REG_ADDR,   // LS Gate Drive Control
-    DRV8305_CONTROL_07 = DRV8305_CONTROL_07_REG_ADDR,   // Gate Drive Control
-    DRV8305_CONTROL_09 = DRV8305_CONTROL_09_REG_ADDR,   // IC Operation
-    DRV8305_CONTROL_0A = DRV8305_CONTROL_0A_REG_ADDR,   // Shunt Amplifier Control
-    DRV8305_CONTROL_0B = DRV8305_CONTROL_0B_REG_ADDR,   // Voltage Regulator Control
-    DRV8305_CONTROL_0C = DRV8305_CONTROL_0C_REG_ADDR,   // VDS Sense Control
+    DRV8305_CONTROL_05 = DRV8305_CONTROL_05_REG_ADDR, // HS Gate Drive Control
+    DRV8305_CONTROL_06 = DRV8305_CONTROL_06_REG_ADDR, // LS Gate Drive Control
+    DRV8305_CONTROL_07 = DRV8305_CONTROL_07_REG_ADDR, // Gate Drive Control
+    DRV8305_CONTROL_09 = DRV8305_CONTROL_09_REG_ADDR, // IC Operation
+    DRV8305_CONTROL_0A = DRV8305_CONTROL_0A_REG_ADDR, // Shunt Amplifier Control
+    DRV8305_CONTROL_0B = DRV8305_CONTROL_0B_REG_ADDR, // Voltage Regulator Control
+    DRV8305_CONTROL_0C = DRV8305_CONTROL_0C_REG_ADDR, // VDS Sense Control
 } drv8305_register_types_t;
 
 typedef enum
 {
-    DRV8305_INIT_STATE,              // -> Initialize all driver registers
-    DRV8305_IDLE_STATE,              // -> If there is no process GO TO SLEEP
-    DRV8305_WAKE_UP_STATE,           // -> DRV8305 wake up
-    DRV8305_SLEEP_STATE,             // -> DRV8305 sleep
-    DRV8305_STATUS_STATE,            // -> DRV8305 status process
-    DRV8305_CONTROL_STATE,           // -> DRV8305 control process
-    DRV8305_DELAY_STATE,             // -> Delay state
+    DRV8305_INIT_STATE,    // -> Initialize all driver registers
+    DRV8305_IDLE_STATE,    // -> Idle state
+    DRV8305_STATUS_STATE,  // -> DRV8305 status process
+    DRV8305_CONTROL_STATE, // -> DRV8305 control process
+    DRV8305_DELAY_STATE,   // -> Delay state
 } drv8305_sm_state_e;
 
 typedef enum
 {
-    DRV8305_SM_STATUS_WARNING_REG,        // Status 0x01
-    DRV8305_SM_STATUS_OV_VDS_REG,         // Status 0x02
-    DRV8305_SM_STATUS_IC_FAULTS_REG,      // Status 0x03
-    DRV8305_SM_STATUS_VGS_FAULTS_REG,     // Status 0x04
-    DRV8305_SM_STATUS_CYCLE_DELAY,        // Delay state
+    DRV8305_SM_STATUS_WARNING_REG,    // Status 0x01
+    DRV8305_SM_STATUS_OV_VDS_REG,     // Status 0x02
+    DRV8305_SM_STATUS_IC_FAULTS_REG,  // Status 0x03
+    DRV8305_SM_STATUS_VGS_FAULTS_REG, // Status 0x04
+    DRV8305_SM_STATUS_CYCLE_DELAY,    // Delay state
 } drv8305_status_sm_state_e;
 
 typedef enum
 {
     // CONTOL REGISTERS WRITE STATES
-    DRV8305_SM_CONTROL_HS_GATE_DRIVE_REG,      // Control 0x05: HS Gate Drive Control
-    DRV8305_SM_CONTROL_LS_GATE_DRIVE_REG,      // Control 0x06: LS Gate Drive Control
-    DRV8305_SM_CONTROL_GATE_DRIVE_REG,         // Control 0x07: Gate Drive Control
-    DRV8305_SM_CONTROL_IC_OPERATION_REG,       // Control 0x09: IC Operation
-    DRV8305_SM_CONTROL_SHUNT_AMPLIFIER_REG,    // Control 0x0A: Shunt Amplifier Control
-    DRV8305_SM_CONTROL_VOLTAGE_REGULATOR_REG,  // Control 0x0B: Voltage Regulator Control
-    DRV8305_SM_CONTROL_VDS_SENSE_REG,          // Control 0x0C: VDS Sense Control
-    DRV8305_SM_CONTROL_CYCLE_DELAY,            // Delay state
-
+    DRV8305_SM_CONTROL_HS_GATE_DRIVE_REG,          // Control 0x05: HS Gate Drive Control
+    DRV8305_SM_CONTROL_LS_GATE_DRIVE_REG,          // Control 0x06: LS Gate Drive Control
+    DRV8305_SM_CONTROL_GATE_DRIVE_REG,             // Control 0x07: Gate Drive Control
+    DRV8305_SM_CONTROL_IC_OPERATION_REG,           // Control 0x09: IC Operation
+    DRV8305_SM_CONTROL_SHUNT_AMPLIFIER_REG,        // Control 0x0A: Shunt Amplifier Control
+    DRV8305_SM_CONTROL_VOLTAGE_REGULATOR_REG,      // Control 0x0B: Voltage Regulator Control
+    DRV8305_SM_CONTROL_VDS_SENSE_REG,              // Control 0x0C: VDS Sense Control
+    
     // CONTOL REGISTERS READ STATES
-    DRV8305_SM_READ_CONTROL_HS_GATE_DRIVE_REG,      // Control 0x05: HS Gate Drive Control
-    DRV8305_SM_READ_CONTROL_LS_GATE_DRIVE_REG,      // Control 0x06: LS Gate Drive Control
-    DRV8305_SM_READ_CONTROL_GATE_DRIVE_REG,         // Control 0x07: Gate Drive Control
-    DRV8305_SM_READ_CONTROL_IC_OPERATION_REG,       // Control 0x09: IC Operation
-    DRV8305_SM_READ_CONTROL_SHUNT_AMPLIFIER_REG,    // Control 0x0A: Shunt Amplifier Control
-    DRV8305_SM_READ_CONTROL_VOLTAGE_REGULATOR_REG,  // Control 0x0B: Voltage Regulator Control
-    DRV8305_SM_READ_CONTROL_VDS_SENSE_REG,          // Control 0x0C: VDS Sense Control
-    DRV8305_SM_READ_CONTROL_CYCLE_DELAY,            // Delay state
+    DRV8305_SM_READ_CONTROL_HS_GATE_DRIVE_REG,     // Control 0x05: HS Gate Drive Control
+    DRV8305_SM_READ_CONTROL_LS_GATE_DRIVE_REG,     // Control 0x06: LS Gate Drive Control
+    DRV8305_SM_READ_CONTROL_GATE_DRIVE_REG,        // Control 0x07: Gate Drive Control
+    DRV8305_SM_READ_CONTROL_IC_OPERATION_REG,      // Control 0x09: IC Operation
+    DRV8305_SM_READ_CONTROL_SHUNT_AMPLIFIER_REG,   // Control 0x0A: Shunt Amplifier Control
+    DRV8305_SM_READ_CONTROL_VOLTAGE_REGULATOR_REG, // Control 0x0B: Voltage Regulator Control
+    DRV8305_SM_READ_CONTROL_VDS_SENSE_REG,         // Control 0x0C: VDS Sense Control
+    
+    DRV8305_SM_CONTROL_CYCLE_DELAY,                // Delay state    
 } drv8305_control_sm_state_e;
 
 typedef struct 
@@ -151,17 +149,31 @@ typedef struct
 
 typedef struct
 {
-    drv8305_state_machine_t         state;
+    bool hs_gate_drive;
+    bool ls_gate_drive;
+    bool gate_drive;
+    bool ic_operation;
+    bool shunt_amplifier;
+    bool voltage_regulator;
+    bool vds_sense;
+}drv8305_control_register_configuration_flag_t;
 
-    drv8305_configuration_t         config;
-    
-    drv8305_control_register_cb_t   control_callbacks;
-    drv8305_status_register_cb_t    status_callbacks;
-    drv8305_hardware_low_level_cb_t hw_callbacks;
+typedef struct
+{
+    drv8305_state_machine_t                       state;
+        
+    bool                                          enable_pin_status;
+    bool                                          drv_wake_pin_status;
 
-    drv8305_register_node_t         register_manager[DRV8305_NUMBER_OF_REGISTERS];
+    drv8305_control_register_cb_t                 control_callbacks;
+    drv8305_status_register_cb_t                  status_callbacks;
+    drv8305_hardware_low_level_cb_t               hw_callbacks;
 
-    bool                            configuration_confirmed;
+    drv8305_configuration_t                       config;    
+
+    drv8305_register_node_t                       register_manager[DRV8305_NUMBER_OF_REGISTERS];
+
+    drv8305_control_register_configuration_flag_t configuration_confirmation_flags;
 } drv8305_user_object_t;
 
 /**
@@ -214,6 +226,24 @@ DRV8305_PUBLIC void drv8305_api_ic_enable             (drv8305_user_object_t *se
  * @see drv8305_api_ic_enable
  */
 DRV8305_PUBLIC void drv8305_api_ic_disable            (drv8305_user_object_t *self);
+
+/**
+ * @brief Put DRV8305 IC into sleep mode
+ * @details Activates the sleep GPIO signal to put the IC into low-power mode.
+ * @param[in,out] self Pointer to DRV8305 user object
+ * @return None
+ * @see drv8305_api_ic_wake_up
+ */
+DRV8305_PUBLIC void drv8305_api_ic_sleep              (drv8305_user_object_t *self);
+
+/**
+ * @brief Wake up DRV8305 IC from sleep mode
+ * @details Deactivates the sleep GPIO signal to wake the IC from low-power mode.
+ * @param[in,out] self Pointer to DRV8305 user object
+ * @return None
+ * @see drv8305_api_ic_sleep
+ */
+DRV8305_PUBLIC void drv8305_api_ic_wake_up            (drv8305_user_object_t *self);
 
 /**
  * @brief Get current DRV8305 configuration

@@ -38,7 +38,6 @@ DRV8305_PUBLIC void drv8305_ic_operation_register_handler      (void *self, uint
 DRV8305_PUBLIC void drv8305_shunt_amplifier_register_handler   (void *self, uint16_t data);
 DRV8305_PUBLIC void drv8305_voltage_regulator_register_handler (void *self, uint16_t data);
 DRV8305_PUBLIC void drv8305_vds_sense_register_handler         (void *self, uint16_t data);
-DRV8305_PUBLIC bool drv8305_is_configuration_confirm           (void);
 
 #ifdef __cplusplus
 }
